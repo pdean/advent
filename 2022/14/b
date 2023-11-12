@@ -24,13 +24,11 @@ proc map {data} {
             if {$dx} { 
                 set sx [/ $dx [abs $dx]]
                 while {$x0 != $x1} {
-                    incr x0 $sx
-                    fill $x0 $y0 } }
+                    incr x0 $sx; fill $x0 $y0 } }
             if {$dy} { 
                 set sy [/ $dy [abs $dy]]
                 while {$y0 != $y1} {
-                    incr y0 $sy
-                    fill $x0 $y0 } } }
+                    incr y0 $sy; fill $x0 $y0 } } }
         set x0 $x1
         set y0 $y1
     }
@@ -46,25 +44,20 @@ proc count {depth} {
         set y 0
         while true {
             if {[+ $y 1] == $floor} {
-                fill $x $y
-                incr n
+                fill $x $y; incr n
                 break
             } elseif {![full $x [+ $y 1]]} {
                 incr y
             } elseif {![full [- $x 1] [+ $y 1]]} {
-                incr y
-                incr x -1
+                incr x -1; incr y
             } elseif {![full [+ $x 1] [+ $y 1]]} {
-                incr y
-                incr x 
+                incr x; incr y
             } elseif {$y == 0} {
-                fill $x $y
-                incr n
+                fill $x $y; incr n
                 set done true
                 break
             } else {
-                fill $x $y
-                incr n
+                fill $x $y; incr n
                 break } } }
     return $n
 }
