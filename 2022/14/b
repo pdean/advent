@@ -79,14 +79,10 @@ proc count {depth} {
     return $n
 }
 
-proc run {input} {
-
-    set in [open $input r]
-    set data [read -nonewline $in]
-    close $in
-
+proc run {} {
+    set data [read -nonewline stdin]
     puts [count [map $data]]
 }
 
-run [lindex $argv 0]
+run 
 
