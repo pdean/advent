@@ -78,8 +78,7 @@ proc run {input} {
     set data [read -nonewline $in]
     close $in
 
-    set depth [init $data]
-    puts [loop $depth]
+    puts [loop [init $data]]
 }
 
 run [lindex $argv 0]
