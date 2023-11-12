@@ -1,58 +1,24 @@
 #!/usr/bin/env tclsh
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
 
-namespace path [list ::tcl::mathop ::tcl::mathfunc]
-package require fileutil
-package require textutil
-namespace import ::textutil::split*
+namespace path {::tcl::mathop ::tcl::mathfunc}
 
-proc full {x y dx dy} {
+proc fill {x y} {
     global map
-    set xn [+ $x $dx]
-    set yn [+ $y $dy]
-    dict exists $map $xn,$yn
+    dict incr map $x,$y
 }
 
-proc loop {} {
-    global map depth
-
-    set n 0
-    while 1 {
-        set x 500
-        set y 0
-        while 1 {
-            if {$y > $depth} {
-                return $n
-            } elseif {![full $x $y 0 1]} {
-                incr y
-            } elseif {![full $x $y -1 1]} {
-                incr y
-                incr x -1
-            } elseif {![full $x $y 1 1]} {
-                incr y
-                incr x 
-            } else {
-                dict incr map $x,$y
-                puts "$x $y"
-                incr n
-                break
-            }
-        }
-    }
+proc full {x y} {
+    global map
+    dict exists $map $x,$y
 }
 
-proc run {input} {
-    global map depth
-
-    set in [open $input r]
-    set data [read -nonewline $in]
-    close $in
+proc init {data} {
     set depth 0
     foreach line [split $data \n] {
         set pts [string map {{->} { } {,} { }} $line]
-        puts $pts
         set rest [lassign $pts x0 y0]
-        dict incr map $x0,$y0
+        fill $x0 $y0
         foreach {x1 y1} $rest {
             set depth [max $depth $y0 $y1]
             set dx [- $x1 $x0]
@@ -61,25 +27,59 @@ proc run {input} {
                 set sx [/ $dx [abs $dx]]
                 while {$x0 != $x1} {
                     incr x0 $sx
-                    dict incr map $x0,$y0
+                    fill $x0 $y0
                 }
             }
             if {$dy} { 
                 set sy [/ $dy [abs $dy]]
                 while {$y0 != $y1} {
                     incr y0 $sy
-                    dict incr map $x0,$y0
+                    fill $x0 $y0
                 }
             }
         }
         set x0 $x1
         set y0 $y1
     }
-    puts [dict keys $map]
-    puts $depth
+    return $depth
+}
 
+proc loop {depth} {
+    set n 0
+    set done 0
+    while {!$done} {
+        set x 500
+        set y 0
+        while 1 {
+            if {$y > $depth} {
+                set done 1
+                break
+            } elseif {![full $x [+ $y 1]]} {
+                incr y
+            } elseif {![full [- $x 1] [+ $y 1]]} {
+                incr y
+                incr x -1
+            } elseif {![full [+ $x 1] [+ $y 1]]} {
+                incr y
+                incr x 
+            } else {
+                fill $x $y
+                incr n
+                break
+            }
+        }
+    }
+    return $n
+}
 
-    puts [loop]
+proc run {input} {
+
+    set in [open $input r]
+    set data [read -nonewline $in]
+    close $in
+
+    set depth [init $data]
+    puts [loop $depth]
 }
 
 run [lindex $argv 0]
