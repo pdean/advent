@@ -5,13 +5,11 @@ namespace path {::tcl::mathop ::tcl::mathfunc}
 
 proc fill {x y} {
     global map
-    dict incr map $x,$y
-}
+    dict incr map $x,$y }
 
 proc full {x y} {
     global map
-    dict exists $map $x,$y
-}
+    dict exists $map $x,$y }
 
 proc map {data} {
     set depth 0
@@ -27,17 +25,12 @@ proc map {data} {
                 set sx [/ $dx [abs $dx]]
                 while {$x0 != $x1} {
                     incr x0 $sx
-                    fill $x0 $y0
-                }
-            }
+                    fill $x0 $y0 } }
             if {$dy} { 
                 set sy [/ $dy [abs $dy]]
                 while {$y0 != $y1} {
                     incr y0 $sy
-                    fill $x0 $y0
-                }
-            }
-        }
+                    fill $x0 $y0 } } }
         set x0 $x1
         set y0 $y1
     }
@@ -72,10 +65,7 @@ proc count {depth} {
             } else {
                 fill $x $y
                 incr n
-                break
-            }
-        }
-    }
+                break } } }
     return $n
 }
 

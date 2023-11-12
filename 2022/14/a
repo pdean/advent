@@ -34,10 +34,7 @@ proc map {data} {
                 set sy [/ $dy [abs $dy]]
                 while {$y0 != $y1} {
                     incr y0 $sy
-                    fill $x0 $y0
-                }
-            }
-        }
+                    fill $x0 $y0 } } }
         set x0 $x1
         set y0 $y1
     }
@@ -65,10 +62,7 @@ proc count {depth} {
             } else {
                 fill $x $y
                 incr n
-                break
-            }
-        }
-    }
+                break } } }
     return $n
 }
 
