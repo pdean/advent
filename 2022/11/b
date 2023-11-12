@@ -1,0 +1,84 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+namespace import ::textutil::split*
+namespace import ::textutil::trim*
+
+
+proc run {input reps} {
+
+    set in [open $input r]
+    set data [read -nonewline $in]
+    close $in
+
+    set pars [splitx $data \n\s*\n]
+
+    foreach par $pars {
+        lassign [split $par \n] l1 l2 l3 l4 l5 l6
+
+        set monkey [scan $l1 "Monkey %d"]
+
+        lassign [split $l2 :] _ t
+        set items [splitx [trim $t " "] ", "]
+
+        lassign [split $l3 =] _ op
+        
+        set test [lindex $l4 end]
+        set true [lindex  $l5 end]
+        set false [lindex  $l6 end]
+        dict set monkeys $monkey \
+            [list items $items op $op test $test true $true false $false] 
+    }
+
+    set names [lsort -integer [dict keys $monkeys]] 
+    set rep 1
+    puts "$reps reps"
+    while {$reps} {
+        puts $rep
+        foreach m $names {
+            set items [dict get $monkeys $m items]
+            set op [dict get $monkeys $m op]
+            set test [dict get $monkeys $m test]
+            set true [dict get $monkeys $m true]
+            set false [dict get $monkeys $m false]
+
+            set moves [list]
+
+            while {[llength $items]} {
+                set items [lassign $items item]
+                set worry [expr [regsub -all old $op $item]]
+                #set worry [/ $worry 3]
+                set rem [% $worry $test]
+                if {$rem} {
+                    set to $false
+                } else {
+                    set to $true
+                }
+
+                dict lappend moves $to $worry
+
+                dict incr insp $m
+            }
+            dict set monkeys $m items [list]
+            foreach to [dict keys $moves] {
+                set move [dict get $moves $to]
+                set toitems [dict get $monkeys $to items]
+                lappend toitems {*}$move
+                dict set monkeys $to items $toitems
+            }
+        }
+
+        incr reps -1
+        incr rep
+    }
+    puts $insp
+    set sorted [lsort -integer [dict values $insp]]
+    set first [lindex $sorted end]
+    set second [lindex $sorted end-1]
+    puts [* $first $second]
+}
+
+run [lindex $argv 0] [lassign $argv 1]

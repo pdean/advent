@@ -1,0 +1,49 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+namespace import ::textutil::split*
+
+proc run {input} {
+
+    set in [open $input r]
+    set data [read -nonewline $in]
+    close $in
+
+    set hx 0
+    set hy 0
+    set tx 0
+    set ty 0
+    dict incr pos "$tx $ty"
+
+    foreach {d n} [split $data] {
+        if {$d eq "R"} {
+            incr hx $n
+        } elseif {$d eq "L"} {
+            incr hx -$n
+        } elseif {$d eq "U"} {
+            incr hy $n
+        } elseif {$d eq "D"} {
+            incr hy -$n
+        }
+
+        while 1 {
+            set dx [- $hx $tx]
+            set dy [- $hy $ty]
+            if {[abs $dx] <= 1 && [abs $dy] <= 1} break
+            if {[abs $dx] <= 1} {
+                set tx $hx
+                incr ty [/ $dy [abs $dy]]
+            } elseif {[abs $dy] <= 1} {
+                set ty $hy
+                incr tx [/ $dx [abs $dx]]
+            }
+            dict incr pos "$tx $ty"
+        }
+    }
+    puts [llength [dict keys $pos]]
+}
+
+run [lindex $argv 0]

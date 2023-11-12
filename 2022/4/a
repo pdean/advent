@@ -1,0 +1,29 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+
+proc run {input} {
+
+    set in [open $input r]
+    set data [read -nonewline $in]
+    set lines [split $data \n]
+
+    set n 0
+    foreach l $lines {
+        lassign [split $l "-,"] l1 r1 l2 r2
+        puts "$l1 $r1 $l2 $r2"
+
+        set t1 [expr {$l1 >= $l2 && $r1 <= $r2}] 
+        set t2 [expr {$l2 >= $l1 && $r2 <= $r1}] 
+        set t3 [expr {$t1 || $t2}]
+        puts "$t1 $t2 $t3"
+        incr n $t3
+    }
+
+    puts $n
+}
+
+run [lindex $argv 0]

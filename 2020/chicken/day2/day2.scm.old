@@ -1,0 +1,36 @@
+(import (chicken io)
+        (chicken irregex)
+        (chicken string)
+        (srfi-1))
+
+(define (curry proc)
+  (lambda (x) (lambda args (apply proc x args))))
+
+(define infile "input")
+
+(define lines
+  (with-input-from-file infile read-lines))
+
+(define (parse line)
+  (let* ((pat "^([0-9]+)-([0-9]+) +([a-z]): +([a-z]+)$")
+         (sre (string->sre pat))
+         (mat (irregex-search sre line))
+         (min (string->number 
+                (irregex-match-substring mat 1)))         
+         (max (string->number 
+                (irregex-match-substring mat 2)))
+         (ch (car 
+               (string->list
+                 (irregex-match-substring mat 3))))
+         (str (string->list
+                  (irregex-match-substring mat 4))))
+   (list min max ch str )))
+
+(define (valid line)
+  (let-values (((min max ch str)
+                (apply values line)))
+    (let ((cnt (count ((curry eq?) ch) str)))
+      (<= min cnt max))))
+
+(print (count valid (map parse lines)))
+

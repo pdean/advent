@@ -1,0 +1,50 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+namespace import ::textutil::split*
+
+proc run {input} {
+
+    set in [open $input r]
+    set data [read -nonewline $in]
+
+    lassign [splitx $data \n\s*\n] head tail
+    set desc1 [lassign [lreverse [split $head \n]] names1]
+
+    set rows [lmap d [lreverse $desc1] {
+       lmap t [splitn $d 4] { string index $t 1 }}]
+
+    foreach row $rows {
+        foreach n $names1 r $row {
+            if {$r ne " "} {
+                dict lappend stacks $n $r
+            }
+        }
+    } 
+
+    foreach m [split $tail \n] {
+        scan $m "move %d from %d to %d" num from to
+        
+        set tmp [dict get $stacks $from]
+        set top [lrange $tmp 0 [- $num 1]]
+        set rest [lrange $tmp $num end]
+        dict set stacks $from $rest
+        set tmp [dict get $stacks $to]
+        set tmp [lreverse $tmp]
+        set tmp [lappend tmp {*}$top]
+        set tmp [lreverse $tmp]
+        dict set stacks $to $tmp
+    }
+
+    set res {}
+
+    foreach key [lsort [dict keys $stacks]] {
+        append res [lindex [dict get $stacks $key] 0]
+    }
+    puts $res
+}
+
+run [lindex $argv 0]

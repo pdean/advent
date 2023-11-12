@@ -1,0 +1,43 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+namespace import ::textutil::split*
+
+proc run {input} {
+
+    set in [open $input r]
+    set data [read -nonewline $in]
+    close $in
+
+
+    set c 1
+    set x 1
+    set cycle [dict create 1 1]
+
+    foreach l [split $data \n] {
+        set arg [lassign $l cmd]
+        if {$cmd eq "noop"} {
+            incr c
+            dict set cycle $c $x
+        }
+        if {$cmd eq "addx"} {
+            incr c
+            dict set cycle $c $x
+            incr c
+            incr x $arg
+            dict set cycle $c $x
+        }
+    }
+
+    set sum 0
+    foreach t {20 60 100 140 180 220} {
+        incr sum [* $t [dict get $cycle $t]]
+    }
+    puts $sum
+
+}
+
+run [lindex $argv 0]

@@ -1,0 +1,95 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+namespace import ::textutil::split*
+namespace import ::textutil::trim*
+
+
+proc run {input reps} {
+
+    set in [open $input r]
+    set data [read -nonewline $in]
+    close $in
+
+    set pars [splitx $data \n\s*\n]
+    set n [llength $pars]
+
+    set lists [lrepeat $n {}]
+    set ops [lrepeat  $n {}]
+    set tests [lrepeat $n {}]
+    set trues [lrepeat $n {}]
+    set falses [lrepeat $n {}]
+
+    set names [list]
+    foreach par $pars {
+        lassign [split $par \n] l1 l2 l3 l4 l5 l6
+        set m [scan $l1 "Monkey %d"]
+        lassign [split $l2 :] _ t
+        lset lists $m [splitx [trim $t " "] ", "]
+        lassign [split $l3 =] _ op
+        lset ops $m $op
+        set test [lindex $l4 end]
+        lset tests $m $test
+        set true [lindex  $l5 end]
+        lset trues $m $true
+        set false [lindex  $l6 end]
+        lset falses $m $false
+        lappend names $m
+    }
+
+    
+    set factor [* {*}$tests]
+
+    set rep 1
+    puts "$reps reps"
+    while {$reps} {
+        puts $rep
+        foreach m $names {
+            set items [lindex $lists $m]
+            set op [lindex $ops $m]
+            set test [lindex $tests $m]
+            set true [lindex $trues $m]
+            set false [lindex $falses $m]
+
+            set tofs [list]
+            set totr [list]
+            foreach item $items {
+                set worry [expr [regsub -all old $op $item]]
+                #set worry [/ $worry 3]
+                set worry [% $worry $factor]
+                set rem [% $worry $test]
+                if {$rem} {
+                    lappend tofs $worry
+                } else {
+                    lappend totr $worry 
+                }
+                dict incr insp $m
+            }
+            set truitems [lindex $lists $true]
+            lappend truitems {*}$totr
+            lset lists $true  $truitems
+
+            set flsitems [lindex $lists $false]
+            lappend flsitems {*}$tofs
+            lset lists $false  $flsitems
+
+            lset lists $m [list]
+        }
+
+        incr reps -1
+        incr rep
+    }
+    set sorted [lsort -integer [dict values $insp]]
+    set first [lindex $sorted end]
+    set second [lindex $sorted end-1]
+    puts [join $lists \n]
+    puts $factor
+    puts $insp
+    puts [* $first $second]
+}
+
+run [lindex $argv 0] [lassign $argv 1]
+#run [lindex $argv 0] 20

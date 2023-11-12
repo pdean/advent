@@ -1,0 +1,33 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+
+proc run {file} {
+
+    set in [open $file r]
+    set data [read -nonewline $in]
+    set games [split $data \n]
+    
+    set win { A Y B Z C X}
+    set draw {A X B Y C Z}
+    set lose {A Z B X C Y}
+    set score {X 1 Y 2 Z 3}
+
+    set strat {X lose Y draw Z win} 
+
+    set scores [lmap g $games {
+            lassign $g them play
+            set dic [set [dict get $strat $play]] 
+            set me [dict get $dic $them]
+            + [* 6 [eq [dict get $win $them] $me]] \
+              [* 3 [eq [dict get $draw $them] $me]] \
+                       [dict get $score $me]
+        }]
+
+    puts [+ {*}$scores]
+}
+
+run [lindex $argv 0]

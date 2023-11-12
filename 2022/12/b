@@ -1,0 +1,46 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path  ::tcl::mathop 
+
+proc run {input} {
+
+    set in [open $input r]
+    set data [read -nonewline $in]
+    close $in
+
+    set grid [concat {*}[lmap l [split $data \n] {split $l {}}]]
+    set C [string first \n $data ]
+    set L [llength $grid]
+    set S [lsearch $grid S]
+    set E [lsearch $grid E]
+    lset grid $S a
+    lset grid $E z
+
+    set todo [list $E 0]
+    dict incr done $E
+
+    while [llength $todo] {
+        set todo [lassign $todo old dist]
+        set g [lindex $grid $old]
+        if {$g eq "a"} {
+            puts $dist
+            break
+        }
+        set h [scan [lindex $grid $old] %c]
+        incr dist
+        foreach d [list -$C -1 1 $C] {
+            set new [+ $old $d]
+            if {$new >= 0 && $new < $L} {
+                if {[dict exists $done $new]} continue
+                set z [scan [lindex $grid $new] %c]
+                if {$h-$z <=1} {
+                    lappend todo $new $dist
+                    dict incr done $new
+                }
+            }
+        }
+    }
+}
+
+run [lindex $argv 0]

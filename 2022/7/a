@@ -1,0 +1,60 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+
+proc run {input} {
+
+    set in [open $input r]
+    set data [read -nonewline $in]
+    set lines [split $data \n]
+
+    set ls 0
+    dict incr paths /
+
+    foreach line $lines {
+        set w1 [lindex $line 0]
+        if {$ls && $w1 eq "$"} {
+            set ls 0
+        }
+        if {$ls} {
+            lassign $line w1 w2
+            if {$w1 eq "dir"} {
+                dict incr paths /[file join {*}$pwd $w2]/
+            } else {
+                dict set files /[file join {*}$pwd $w2] $w1
+            }
+        } else {
+            set cmd [lindex $line 1]
+            if {$cmd eq "ls"} {
+                set ls 1
+            } elseif {$cmd eq "cd"} {
+                set dir [lindex $line 2]
+                if {$dir eq "/"} {
+                    set pwd {}
+                } elseif {$dir eq ".."} {
+                    set pwd [lrange $pwd 0 end-1]
+                } else {
+                    lappend pwd $dir
+                }
+            }
+        }
+    }
+
+    foreach path [dict keys $paths] {
+        foreach file [dict keys $files $path*] {
+            dict incr sizes $path [dict get $files $file]
+        }
+    }
+
+    set total 0
+    foreach size [lsort -integer [dict values $sizes ]] {
+        if {$size > 100000} break
+        incr total $size
+    }
+    puts $total
+}
+
+run [lindex $argv 0]

@@ -1,0 +1,28 @@
+--- a	2023-11-11 05:27:17.189996877 +1000
++++ b	2023-11-11 12:12:12.479982396 +1000
+@@ -17,12 +17,13 @@
+     lset grid $S a
+     lset grid $E z
+ 
+-    set todo [list $S 0]
+-    dict incr done $S
++    set todo [list $E 0]
++    dict incr done $E
+ 
+     while [llength $todo] {
+         set todo [lassign $todo old dist]
+-        if {$old == $E} {
++        set g [lindex $grid $old]
++        if {$g eq "a"} {
+             puts $dist
+             break
+         }
+@@ -33,7 +34,7 @@
+             if {$new >= 0 && $new < $L} {
+                 if {[dict exists $done $new]} continue
+                 set z [scan [lindex $grid $new] %c]
+-                if {$z-$h <=1} {
++                if {$h-$z <=1} {
+                     lappend todo $new $dist
+                     dict incr done $new
+                 }

@@ -1,0 +1,74 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+namespace import ::textutil::split*
+
+proc run {input} {
+
+    set in [open $input r]
+    set data [read -nonewline $in]
+    close $in
+
+    set hx 0
+    set hy 0
+    dict incr pos "0 0"
+    set tails [split 123456789 {}]
+    foreach t $tails { dict set tail $t [list 0 0] }
+
+    foreach {d n} [split $data] {
+        set ox $hx
+        set oy $hy
+
+        if {$d eq "R"} {
+            incr hx $n
+        } elseif {$d eq "L"} {
+            incr hx -$n
+        } elseif {$d eq "U"} {
+            incr hy $n
+        } elseif {$d eq "D"} {
+            incr hy -$n
+        }
+
+        while 1 {
+            set dx [- $hx $ox]
+            set dy [- $hy $oy]
+            if {$dx == 0 && $dy == 0}  break 
+            if {$dx} {
+                incr ox [/ $dx [abs $dx]]
+            }
+            if {$dy} {
+                incr oy [/ $dy [abs $dy]]
+            }
+
+            set px $ox
+            set py $oy
+            foreach t $tails {
+                lassign [dict get $tail $t] tx ty
+
+                set dx [- $px $tx]
+                set dy [- $py $ty]
+                if {!([abs $dx] <= 1 && [abs $dy] <= 1)} {
+                    if {$dx} {
+                        incr tx [/ $dx [abs $dx]]
+                    }
+                    if {$dy} {
+                        incr ty [/ $dy [abs $dy]]
+                    }
+                    if {$t eq "9"} {
+                        dict incr pos "$tx $ty"
+                    }
+                }
+                dict set tail $t [list $tx $ty]
+                set px $tx
+                set py $ty
+
+            }
+        }
+    }
+    puts [llength [dict keys $pos]]
+}
+
+run [lindex $argv 0]

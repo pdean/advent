@@ -1,0 +1,73 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+namespace import ::textutil::split*
+package require json
+
+proc tolist {x} {
+    set json [string cat "{ \"data\": " $x " }"]
+    set dict [::json::json2dict $json]
+    dict get $dict data
+}
+
+proc cmp {L R} {
+    puts "  cmp $L "
+    puts "      $R\n"
+    foreach l $L r $R {
+        puts "      $l "
+        puts "      $r"
+        set nl [llength $l] 
+        set nr [llength $r]
+        puts "        $nl ^ $nr"
+
+        if {$nl == 0 && $nr != 0} {
+            return 1
+        } elseif {$nl == 0 && $nr == 0} {
+            set res 0
+        } elseif {$nl != 0 && $nr == 0} {
+             return -1
+        }
+        
+       if {[string is integer $l] && [string is integer $r]} { 
+           if {$l < $r} {return 1}
+           if {$l > $r} {return -1} 
+           set res 0
+       } else {
+           set res [cmp $l $r]
+       }
+
+       if {!$res} continue
+       return $res
+    }
+    puts "    l=r"
+    return 0
+}
+
+proc run {input} {
+
+    set in [open $input r]
+    set data [read -nonewline $in]
+    close $in
+
+    set pairs [lmap l [splitx  $data \n\s*\n] {split $l \n}] 
+        
+    set goods [list]
+    set n 0
+    foreach pair $pairs {
+        incr n
+        puts "pair $n"
+        lassign [lmap p $pair {tolist $p}] L R
+        
+        set res [cmp $L $R] 
+        puts "$n\t$res"
+        if {$res > 0} {
+            lappend goods $n
+        }
+    }
+    if {[llength $goods]} { puts [+ {*}$goods]}
+}
+
+run [lindex $argv 0]

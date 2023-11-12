@@ -1,0 +1,29 @@
+% set exp "old + 6"
+old + 6
+% regsub old $exp
+wrong # args: should be "regsub ?-option ...? exp string subSpec ?varName?"
+% regsub old $exp 10
+10 + 6
+% expr [regsub old $exp 10]
+16
+% set x 12
+12
+% expr [regsub old $exp $x]
+18
+% set exp "old + old"
+old + old
+% expr [regsub old $exp $x]
+invalid bareword "old"
+in expression "12 + old";
+should be "$old" or "{old}" or "old(...)" or ...
+% expr [regsub -all old $exp $x]
+24
+% set exp "old * old"
+old * old
+% expr [regsub -all old $exp $x]
+144
+% set x 13
+13
+% expr [regsub -all old $exp $x]
+169
+

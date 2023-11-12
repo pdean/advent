@@ -1,0 +1,28 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+
+proc run {input} {
+
+    set in [open $input r]
+    set data [read -nonewline $in]
+    set chars [split $data {}]
+
+    set i 0
+
+    while {1} {
+        set code [lrange $chars $i [+ $i 3]]
+        set sort [lsort -unique $code]
+        set l [llength $sort]
+        if {$l == 4} break
+        incr i
+    }
+    puts [+ $i 4]
+        
+
+}
+
+run [lindex $argv 0]

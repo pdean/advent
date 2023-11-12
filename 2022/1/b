@@ -1,0 +1,17 @@
+#!/usr/bin/env tclsh
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+
+proc run {file} {
+    set in [open $file r]
+    set data [read -nonewline $in]
+    set pars [textutil::splitx $data \n\s*\n]
+    set lines [lmap p $pars {list {*}$p}]
+    set sums [lmap l $lines {+ {*}$l}]
+    set sums [lsort -integer $sums]
+    puts [+ {*}[lrange $sums end-2 end]]
+}
+
+run [lindex $argv 0]
+

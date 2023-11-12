@@ -1,0 +1,49 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+package require struct::set
+
+proc run {file} {
+
+    set in [open $file r]
+    set data [read -nonewline $in]
+    set lines [split $data \n]
+
+    set items [lmap l $lines {
+        set all [split $l {}]
+        set n [llength $all]
+        set m [/ $n 2]
+        incr m -1
+        set fst [lrange $all 0 $m]
+        set scd [lrange $all end-$m end]
+
+        list $fst $scd}]
+
+    puts [join $items \n]
+
+    set items [lmap i $items {
+        lassign $i f s
+        lindex [struct::set intersect $f $s] 0
+    }]
+
+    puts [join $items \n]
+
+    set items [lmap i $items {
+        set val [scan $i %c]
+        if {$val >= 96} {
+            - $val 96
+        } else {
+            - $val 38
+        }
+    }]
+
+    puts [join $items \n]
+
+    puts [+ {*}$items]
+
+}
+
+run [lindex $argv 0]

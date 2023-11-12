@@ -1,0 +1,63 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+
+proc run {input} {
+
+    set in [open $input r]
+    set data [read -nonewline $in]
+    set lines [split $data \n]
+
+    set n 0
+    foreach l $lines {
+        set l [string length $l]
+        if {!$l} break 
+        incr n
+    }
+    incr n -1
+    puts $n
+
+    set desc  [lrange $lines 0 [- $n 1]]
+    set names [lindex $lines $n]
+    set moves [lrange $lines [+ $n 2] end]
+        
+    set rows [lmap d $desc {
+       lmap t [textutil::splitn $d 4] { string index $t 1 }}]
+
+    foreach row $rows {
+        foreach n $names r $row {
+            if {$r ne " "} {
+                dict lappend stacks $n $r
+            }
+        }
+    } 
+    puts $stacks
+    puts ""
+
+    foreach m $moves {
+        scan $m "move %d from %d to %d" num from to
+        puts "$num $from $to"
+        
+        set tmp [dict get $stacks $from]
+        set top [lrange $tmp 0 [- $num 1]]
+        set rest [lrange $tmp $num end]
+        dict set stacks $from $rest
+        set tmp [dict get $stacks $to]
+        set tmp [lreverse $tmp]
+        set tmp [lappend tmp {*}[lreverse $top]]
+        set tmp [lreverse $tmp]
+        dict set stacks $to $tmp
+        puts $stacks
+    }
+
+    set res {}
+    foreach key [lsort [dict keys $stacks]] {
+        append res [lindex [dict get $stacks $key] 0]
+    }
+    puts $res
+}
+
+run [lindex $argv 0]
