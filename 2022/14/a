@@ -46,13 +46,13 @@ proc map {data} {
 
 proc count {depth} {
     set n 0
-    set done 0
+    set done false
     while {!$done} {
         set x 500
         set y 0
-        while 1 {
+        while true {
             if {$y > $depth} {
-                set done 1
+                set done true
                 break
             } elseif {![full $x [+ $y 1]]} {
                 incr y
