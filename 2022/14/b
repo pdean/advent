@@ -45,9 +45,9 @@ proc map {data} {
 }
 
 proc count {depth} {
+    set floor [+ $depth 2]
     set n 0
     set done false
-    set floor [+ $depth 2]
     while {!$done} {
         set x 500
         set y 0
