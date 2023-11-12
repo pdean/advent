@@ -13,7 +13,7 @@ proc full {x y} {
     dict exists $map $x,$y
 }
 
-proc init {data} {
+proc map {data} {
     set depth 0
     foreach line [split $data \n] {
         set pts [string map {{->} { } {,} { }} $line]
@@ -44,7 +44,7 @@ proc init {data} {
     return $depth
 }
 
-proc loop {depth} {
+proc count {depth} {
     set n 0
     set done 0
     while {!$done} {
@@ -78,7 +78,7 @@ proc run {input} {
     set data [read -nonewline $in]
     close $in
 
-    puts [loop [init $data]]
+    puts [count [map $data]]
 }
 
 run [lindex $argv 0]
