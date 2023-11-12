@@ -65,6 +65,7 @@ proc loop {depth} {
                 incr y
                 incr x 
             } elseif {$y == 0} {
+                fill $x $y
                 incr n
                 set done 1
                 break
@@ -88,3 +89,4 @@ proc run {input} {
 }
 
 run [lindex $argv 0]
+
