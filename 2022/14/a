@@ -10,14 +10,14 @@ proc run {input} {
     set in [open $input r]
     set data [read -nonewline $in]
     close $in
-    set maxy 0
+    set depth 0
     foreach line [split $data \n] {
         set pts [string map {{->} { } {,} { }} $line]
         puts $pts
         set rest [lassign $pts x0 y0]
         dict incr map $x0,$y0
         foreach {x1 y1} $rest {
-            set maxy [max $maxy $y0 $y1]
+            set depth [max $depth $y0 $y1]
             set dx [- $x1 $x0]
             set dy [- $y1 $y0]
             if {$dx} {
@@ -39,7 +39,7 @@ proc run {input} {
         set y0 $y1
     }
     puts [lsort [dict keys $map]]
-    puts $maxy
+    puts $depth
 
 exit
     set n 0
