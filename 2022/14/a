@@ -6,7 +6,25 @@ package require fileutil
 package require textutil
 namespace import ::textutil::split*
 
+proc loop {} {
+    global map depth
+
+    set n 0
+    while 1 {
+        set x0 500
+        set y0 0
+        incr n
+
+
+
+    }
+}
+
+
 proc run {input} {
+
+    global map depth
+
     set in [open $input r]
     set data [read -nonewline $in]
     close $in
@@ -42,13 +60,8 @@ proc run {input} {
     puts $depth
 
 exit
-    set n 0
-    while 1 {
-        set x0 500
-        set y0 0
 
-    }
-
+    puts [loop]
 }
 
 run [lindex $argv 0]
