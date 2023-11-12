@@ -47,12 +47,14 @@ proc init {data} {
 proc loop {depth} {
     set n 0
     set done 0
+    set floor [+ $depth 2]
     while {!$done} {
         set x 500
         set y 0
         while 1 {
-            if {$y > $depth} {
-                set done 1
+            if {[+ $y 1] == $floor} {
+                fill $x $y
+                incr n
                 break
             } elseif {![full $x [+ $y 1]]} {
                 incr y
@@ -62,6 +64,10 @@ proc loop {depth} {
             } elseif {![full [+ $x 1] [+ $y 1]]} {
                 incr y
                 incr x 
+            } elseif {$y == 0} {
+                incr n
+                set done 1
+                break
             } else {
                 fill $x $y
                 incr n
@@ -78,8 +84,7 @@ proc run {input} {
     set data [read -nonewline $in]
     close $in
 
-    set depth [init $data]
-    puts [loop $depth]
+    puts [loop [init $data]]
 }
 
 run [lindex $argv 0]
