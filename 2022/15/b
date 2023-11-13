@@ -2,41 +2,58 @@
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
-package require fileutil
-package require textutil
-namespace import ::textutil::split*
 
-proc run {row} {
+proc run {bound} {
 
     set data [read -nonewline stdin]
     set lines [lmap l [split $data \n] {
         regsub -all {[^-0-9]} $l { } }]
 
-    set spans [list]
+    set sc [list]
+    set ka [list]
+    set kb [list]
 
     foreach l $lines {
         lassign $l sx sy bx by
-        if {$by == $row} {
-            dict incr rowbeac $bx,$by
-        }
-        set k [+ [abs [- $bx $sx]] [abs [- $by $sy]]]
-        set y [abs [- $row $sy]]
-        set d [- $k $y]
-        if {$d >= 0} {
-            set lx [- $sx $d]
-            set rx [+ $sx $d]
-            lappend spans $lx $rx
+        set r [+ [abs [- $bx $sx]] [abs [- $by $sy]]]
+        lappend sc $sx $sy $r
+        lappend ka [+ $sy -$sx  $r  1]
+        lappend ka [+ $sy -$sx -$r -1]
+        lappend kb [+ $sx  $sy  $r  1]
+        lappend kb [+ $sx  $sy -$r -1]
+    }
+    puts $sc
+    puts $ka 
+    puts $kb
+
+    foreach a $ka {
+        foreach b $kb {
+            puts "  $a $b"
+            set x [+ $b -$a]
+            if {$x % 2} continue
+            set y [+ $a $b]
+            if {$y % 2} continue
+            set x [/ $x 2]
+            set y [/ $y 2]
+            if {![< 0 $x $bound]} continue
+            if {![< 0 $y $bound]} continue
+            puts "$x $y"
+            continue
+            set fail false
+            foreach {sx sy r} $sc {
+                set rs [+ [abs [- $x $sx]] [abs [- $y $sy]]]
+                puts "$r $rs"
+                if {$r >= $rs} {
+                    set fail true
+                    break
+                }
+            }
+            if {!$fail} {
+                puts "$x $y"
+                exit
+            }
         }
     }
-    set nb 0
-    if {[info exists rowbeac]} {
-        set nb [llength [dict keys $rowbeac]]
-    } 
-
-    puts $spans
-    set n [- [max {*}$spans] [min {*}$spans] -1 $nb ]
-    puts $n
-
 }
 
 run [lindex $argv 0]
