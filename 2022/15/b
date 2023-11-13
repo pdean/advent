@@ -3,6 +3,10 @@
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
 
+proc md {x1 y1 x2 y2} {
+    + [abs [- $x1 $x2]] [abs [- $y1 $y2]]
+}
+
 proc run {bound} {
 
     set data [read -nonewline stdin]
@@ -15,7 +19,7 @@ proc run {bound} {
 
     foreach l $lines {
         lassign $l sx sy bx by
-        set r [+ [abs [- $bx $sx]] [abs [- $by $sy]]]
+        set r [md $sx $sy $bx $by]
         lappend sc $sx $sy $r
         lappend ka [+ $sy -$sx  $r  1]
         lappend ka [+ $sy -$sx -$r -1]
@@ -28,8 +32,7 @@ proc run {bound} {
 
     foreach a $ka {
         foreach b $kb {
-            puts "  $a $b"
-            set x [+ $b -$a]
+            set x [- $b $a]
             if {$x % 2} continue
             set y [+ $a $b]
             if {$y % 2} continue
@@ -37,13 +40,10 @@ proc run {bound} {
             set y [/ $y 2]
             if {![< 0 $x $bound]} continue
             if {![< 0 $y $bound]} continue
-            puts "$x $y"
-            continue
             set fail false
             foreach {sx sy r} $sc {
-                set rs [+ [abs [- $x $sx]] [abs [- $y $sy]]]
-                puts "$r $rs"
-                if {$r >= $rs} {
+                set rs [md $x $y $sx $sy]
+                if {$rs < $r} {
                     set fail true
                     break
                 }
