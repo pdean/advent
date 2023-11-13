@@ -1,0 +1,42 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+namespace import ::textutil::split*
+
+proc run {row} {
+
+    set data [read -nonewline stdin]
+    set lines [lmap l [split $data \n] {
+        regsub -all {[^-0-9]} $l { } }]
+
+    set spans [list]
+
+    foreach l $lines {
+        lassign $l sx sy bx by
+        if {$by == $row} {
+            dict incr rowbeac $bx,$by
+        }
+        set k [+ [abs [- $bx $sx]] [abs [- $by $sy]]]
+        set y [abs [- $row $sy]]
+        set d [- $k $y]
+        if {$d >= 0} {
+            set lx [- $sx $d]
+            set rx [+ $sx $d]
+            lappend spans $lx $rx
+        }
+    }
+    set nb 0
+    if {[info exists rowbeac]} {
+        set nb [llength [dict keys $rowbeac]]
+    } 
+
+    puts $spans
+    set n [- [max {*}$spans] [min {*}$spans] -1 $nb ]
+    puts $n
+
+}
+
+run [lindex $argv 0]
