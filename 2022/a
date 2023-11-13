@@ -6,12 +6,10 @@ package require fileutil
 package require textutil
 namespace import ::textutil::split*
 
-proc run {input} {
+proc run {} {
 
-    set in [open $input r]
-    set data [read -nonewline $in]
-    close $in
+    set data [read -nonewline stdin]
 
 }
 
-run [lindex $argv 0]
+run
