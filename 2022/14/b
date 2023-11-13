@@ -66,6 +66,4 @@ proc run {} {
     set data [read -nonewline stdin]
     puts [count [map $data]]
 }
-
-run 
-
+run
