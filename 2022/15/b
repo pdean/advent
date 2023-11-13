@@ -26,9 +26,6 @@ proc run {bound} {
         lappend kb [+ $sx  $sy  $r  1]
         lappend kb [+ $sx  $sy -$r -1]
     }
-    puts $sc
-    puts $ka 
-    puts $kb
 
     foreach a $ka {
         foreach b $kb {
@@ -49,8 +46,7 @@ proc run {bound} {
                 }
             }
             if {!$fail} {
-                puts "$x $y"
-                exit
+                puts [+ [* $x $bound] $y]
             }
         }
     }
