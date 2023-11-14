@@ -2,21 +2,38 @@
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
-package require fileutil
-package require textutil
-namespace import ::textutil::split*
+package require struct::graph::op
 
 proc run {} {
 
     set data [read -nonewline stdin]
     set data [string map {; " " , " " = " "} $data]
 
+    struct::graph cave
+
     foreach line [split $data \n] {
         set valve [lindex $line 1]
         set rate [lindex $line 5]
         set valves [lrange $line 10 end]
         puts "$valve $rate $valves"
+
+        if {![cave node exists $valve]} {
+            cave node insert $valve
+        }
+        foreach v $valves {
+            if {![cave node exists $v]} {
+                cave node insert $v
+            }
+            cave arc insert $valve $v
+        }
     }
+    cave arc setunweighted 1
+
+    puts [::struct::graph::op::distance cave AA HH]
+    puts [::struct::graph::op::distance cave AA JJ]
+
+
+
 
 }
 
