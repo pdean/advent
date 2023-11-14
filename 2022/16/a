@@ -16,6 +16,7 @@ proc run {} {
         set valve [lindex $line 1]
         set rate [lindex $line 5]
         set valves [lrange $line 10 end]
+        puts "$valve $rate $valves"
 
         if {$rate != 0} {
             struct::set include destv $valve
@@ -39,7 +40,7 @@ proc run {} {
 
     set time 30
     set flow 0
-    set dests {AA DD BB JJ HH EE CC}
+    set dests {AA JJ DD HH BB EE CC}
 
     set rest [lassign $dests org]
 
@@ -49,8 +50,8 @@ proc run {} {
             set t $time
             set dist [::struct::graph::op::distance cave $org $d]
             set rate [cave node get $d rate]
-            set t [- $time 1 $dist]
-            set val [* $rate $time ] 
+            set t [- $t 1 $dist]
+            set val [* $rate $t ] 
             puts "     $t $org $d $dist $rate $val"
         }
 
