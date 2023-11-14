@@ -5,7 +5,6 @@ namespace path [list ::tcl::mathop ::tcl::mathfunc]
 package require struct::graph::op
 package require struct::set
 
-
 proc run {} {
 
     set data [read -nonewline stdin]
@@ -17,8 +16,6 @@ proc run {} {
         set valve [lindex $line 1]
         set rate [lindex $line 5]
         set valves [lrange $line 10 end]
-        puts "$valve $rate $valves"
-
 
         if {$rate != 0} {
             struct::set include destv $valve
@@ -27,6 +24,8 @@ proc run {} {
         if {![cave node exists $valve]} {
             cave node insert $valve
         }
+        cave node set $valve rate $rate
+
         foreach v $valves {
             if {![cave node exists $v]} {
                 cave node insert $v
@@ -37,14 +36,36 @@ proc run {} {
     cave arc setunweighted 1
 
     set org AA
+    set time 30
     foreach dest $destv {
         set dist [::struct::graph::op::distance cave $org $dest]
-
-        puts "$org $dest $dist"
+        set rate [cave node get $dest rate]
+        set val [* $rate [- $time 1 $dist]] 
+        puts "$time $org $dest $dist $rate $val"
     }
-        
+    puts ""
 
+    ::struct::set exclude destv DD
+    set org DD
+    set time 28
+    foreach dest $destv {
+        set dist [::struct::graph::op::distance cave $org $dest]
+        set rate [cave node get $dest rate]
+        set val [* $rate [- $time 1 $dist]] 
+        puts "$time $org $dest $dist $rate $val"
+    }
+    puts ""
 
+    ::struct::set exclude destv BB
+    set org BB
+    set time 25
+    foreach dest $destv {
+        set dist [::struct::graph::op::distance cave $org $dest]
+        set rate [cave node get $dest rate]
+        set val [* $rate [- $time 1 $dist]] 
+        puts "$time $org $dest $dist $rate $val"
+    }
+    puts ""
 }
 
 run
