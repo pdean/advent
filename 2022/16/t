@@ -9,7 +9,7 @@ set s 0
 
 foreach {a b } $t {
     set p [* $a $b]
-    puts "$a $b $p"
+    puts "$a\t$b\t$p"
     incr s $p
 }
 puts ""
