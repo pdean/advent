@@ -35,37 +35,40 @@ proc run {} {
     }
     cave arc setunweighted 1
 
-    set org AA
+    puts ""
+
     set time 30
-    foreach dest $destv {
-        set dist [::struct::graph::op::distance cave $org $dest]
-        set rate [cave node get $dest rate]
-        set val [* $rate [- $time 1 $dist]] 
-        puts "$time $org $dest $dist $rate $val"
-    }
-    puts ""
+    set flow 0
+    set dests {AA DD BB JJ HH EE CC}
 
-    ::struct::set exclude destv DD
-    set org DD
-    set time 28
-    foreach dest $destv {
-        set dist [::struct::graph::op::distance cave $org $dest]
-        set rate [cave node get $dest rate]
-        set val [* $rate [- $time 1 $dist]] 
-        puts "$time $org $dest $dist $rate $val"
-    }
-    puts ""
+    set rest [lassign $dests org]
 
-    ::struct::set exclude destv BB
-    set org BB
-    set time 25
-    foreach dest $destv {
+    foreach dest $rest {
+        puts $org
+         foreach d $destv {
+            set t $time
+            set dist [::struct::graph::op::distance cave $org $d]
+            set rate [cave node get $d rate]
+            set t [- $time 1 $dist]
+            set val [* $rate $time ] 
+            puts "     $t $org $d $dist $rate $val"
+        }
+
         set dist [::struct::graph::op::distance cave $org $dest]
         set rate [cave node get $dest rate]
-        set val [* $rate [- $time 1 $dist]] 
-        puts "$time $org $dest $dist $rate $val"
-    }
-    puts ""
+        set time [- $time 1 $dist]
+        set val [* $rate $time] 
+        incr flow $val
+        puts "$time $org $dest $dist $rate $val $flow"
+        set org $dest
+        struct::set exclude destv $org
+
+        puts ""
+        
+   }
+
+
+
 }
 
 run
