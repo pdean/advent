@@ -1,0 +1,13 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path ::tcl::mathop
+
+set t { 28 20 25 13 21 21 13 22 9 3 5 2}
+
+set s 0
+
+foreach {a b } $t {
+    incr s [* $a $b]
+}
+puts $s
