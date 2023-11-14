@@ -3,6 +3,8 @@
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
 package require struct::graph::op
+package require struct::set
+
 
 proc run {} {
 
@@ -17,6 +19,11 @@ proc run {} {
         set valves [lrange $line 10 end]
         puts "$valve $rate $valves"
 
+
+        if {$rate != 0} {
+            struct::set include destv $valve
+        }
+
         if {![cave node exists $valve]} {
             cave node insert $valve
         }
@@ -29,10 +36,13 @@ proc run {} {
     }
     cave arc setunweighted 1
 
-    puts [::struct::graph::op::distance cave AA HH]
-    puts [::struct::graph::op::distance cave AA JJ]
+    set org AA
+    foreach dest $destv {
+        set dist [::struct::graph::op::distance cave $org $dest]
 
-
+        puts "$org $dest $dist"
+    }
+        
 
 
 }
