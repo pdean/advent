@@ -9,6 +9,14 @@ namespace import ::textutil::split*
 proc run {} {
 
     set data [read -nonewline stdin]
+    set data [string map {; " " , " " = " "} $data]
+
+    foreach line [split $data \n] {
+        set valve [lindex $line 1]
+        set rate [lindex $line 5]
+        set valves [lrange $line 10 end]
+        puts "$valve $rate $valves"
+    }
 
 }
 
