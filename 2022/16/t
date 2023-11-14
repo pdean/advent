@@ -8,6 +8,9 @@ set t { 28 20 25 13 21 21 13 22 9 3 6 2}
 set s 0
 
 foreach {a b } $t {
-    incr s [* $a $b]
+    set p [* $a $b]
+    puts "$a $b $p"
+    incr s $p
 }
+puts ""
 puts $s
