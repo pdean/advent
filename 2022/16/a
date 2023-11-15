@@ -36,14 +36,12 @@ proc run {} {
     }
     cave arc setunweighted 1
 
-    set adj [list]
-    dict set adj AA [::struct::graph::op::dijkstra cave AA \
-                -outputformat distances]
-
+    struct::set include destv AA
     foreach org $destv {
         dict set adj $org [::struct::graph::op::dijkstra cave $org \
                     -outputformat distances]
     }
+    struct::set exclude destv AA
 
     puts $adj
     puts ""
