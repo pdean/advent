@@ -16,7 +16,7 @@ proc run {} {
         set valve [lindex $line 1]
         set rate [lindex $line 5]
         set valves [lrange $line 10 end]
-        puts "$valve $rate $valves"
+#        puts "$valve $rate $valves"
 
         if {$rate != 0} {
             struct::set include destv $valve
@@ -43,17 +43,7 @@ proc run {} {
     set dests {AA DD BB JJ HH  EE CC}
 
     set rest [lassign $dests org]
-
     foreach dest $rest {
-        foreach d $destv {
-            set t $time
-            set dist [dict get $adj "$org $d"]
-            set rate [cave node get $d rate]
-            set t [- $t 1 $dist]
-            set val [* $rate $t ] 
-            puts "     $t $org $d $dist $rate $val"
-        }
-
         set dist [dict get $adj "$org $dest"]
         set rate [cave node get $dest rate]
         set time [- $time 1 $dist]
@@ -62,9 +52,6 @@ proc run {} {
         puts "$time $org $dest $dist $rate $val $flow"
         set org $dest
         struct::set exclude destv $org
-
-        puts ""
-
    }
 }
 
