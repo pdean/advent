@@ -36,15 +36,7 @@ proc run {} {
     }
     cave arc setunweighted 1
 
-    struct::set include destv AA
-    foreach org $destv {
-        dict set adj $org [::struct::graph::op::dijkstra cave $org \
-                    -outputformat distances]
-    }
-    struct::set exclude destv AA
-
-    puts $adj
-    puts ""
+    set adj [struct::graph::op::FloydWarshall cave]
 
     set time 30
     set flow 0
@@ -55,14 +47,14 @@ proc run {} {
     foreach dest $rest {
         foreach d $destv {
             set t $time
-            set dist [dict get $adj $org $d]
+            set dist [dict get $adj "$org $d"]
             set rate [cave node get $d rate]
             set t [- $t 1 $dist]
             set val [* $rate $t ] 
             puts "     $t $org $d $dist $rate $val"
         }
 
-        set dist [dict get $adj $org $dest]
+        set dist [dict get $adj "$org $dest"]
         set rate [cave node get $dest rate]
         set time [- $time 1 $dist]
         set val [* $rate $time] 
@@ -74,11 +66,6 @@ proc run {} {
         puts ""
 
    }
-
-   puts [struct::graph::op::FloydWarshall cave]
-
-
-
 }
 
 run
