@@ -68,6 +68,8 @@ proc run {} {
         
    }
 
+   puts [struct::graph::op::FloydWarshall cave]
+
 
 
 }
