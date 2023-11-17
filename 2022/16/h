@@ -1,0 +1,44 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+
+proc process {A} {
+    puts $A
+}
+
+proc generate {A} {
+
+    set n [llength $A]
+    set c [lrepeat $n 0]
+
+    process $A
+
+    set i 1
+    while {$i < $n} {
+        set k [lindex $c $i]
+        if {$k < $i} {
+            if {$i % 2} {
+                set j $k
+            } else {
+                set j 0
+            }
+            set s [lindex $A $i]
+            set t [lindex $A $j]
+            lset A $i $t
+            lset A $j $s
+
+            process $A
+            
+            lset c $i [incr k]
+            set i 1
+        } else {
+            lset c $i 0
+            incr i
+        }
+    }
+}
+
+generate [list DD BB JJ HH  EE CC]
+
+
