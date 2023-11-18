@@ -4,7 +4,7 @@
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
 
 proc process {A} {
-    puts $A
+#    puts $A
 }
 
 proc generate {A} {
@@ -39,6 +39,22 @@ proc generate {A} {
     }
 }
 
-generate [list DD BB JJ HH  EE CC]
 
+generate {
+    ZZ
+ZQ
+KZ
+MT
+WG
+IP
+IF
+IS
+BH
+SI
+RW
+NH
+AO
+EB
+UH
+}
 
