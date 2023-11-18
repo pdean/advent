@@ -5,7 +5,7 @@ namespace path [list ::tcl::mathop ::tcl::mathfunc]
 package require struct::graph::op
 package require struct::set
 
-proc bestflow {cur timeleft seen targets} {
+proc bestflow {cur time seen targets} {
     global adj
 
     ::struct::set include seen $cur
@@ -14,11 +14,10 @@ proc bestflow {cur timeleft seen targets} {
     set bestflow 0
     foreach target $targets {
         set dist [dict get $adj "$cur $target"]
-        set timeleft [- $timeleft 1 $dist]
+        set timeleft [- $time 1 $dist]
         if {$timeleft > 0} {
             set rate [cave node get $target rate]
             set flow [* $rate $timeleft] 
-            puts "$cur $target $dist $rate $timeleft $flow"
             set nextflow [bestflow $target $timeleft $seen $targets]
             incr flow $nextflow
             if {$flow > $bestflow} {
@@ -61,6 +60,7 @@ proc run {} {
     }
     cave arc setunweighted 1
     set adj [struct::graph::op::FloydWarshall cave]
+    puts [llength $adj]
 
     ::struct::set include targets AA
     puts $targets
