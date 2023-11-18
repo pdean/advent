@@ -5,12 +5,37 @@ namespace path [list ::tcl::mathop ::tcl::mathfunc]
 package require struct::graph::op
 package require struct::set
 
+proc bestflow {cur timeleft seen targets} {
+    global adj
+
+    ::struct::set include seen $cur
+    ::struct::set subtract targets $seen
+
+    set bestflow 0
+    foreach target $targets {
+        set dist [dict get $adj "$cur $target"]
+        set timeleft [- $timeleft 1 $dist]
+        if {$timeleft > 0} {
+            set rate [::cave node get $target rate]
+            set flow [* $rate $timeleft] 
+            puts "$cur $target $dist $rate $timeleft $flow"
+            set nextflow [bestflow $target $timeleft $seen $targets]
+            incr flow $nextflow
+            if {$flow > $bestflow} {
+                set bestflow $flow
+            }
+        }
+    }
+    return $bestflow
+}
+
 proc run {} {
+    global adj 
 
     set data [read -nonewline stdin]
     set data [string map {; " " , " " = " "} $data]
 
-    struct::graph cave
+    struct::graph ::cave
 
     foreach line [split $data \n] {
         set valve [lindex $line 1]
@@ -18,41 +43,27 @@ proc run {} {
         set valves [lrange $line 10 end]
 #        puts "$valve $rate $valves"
 
-        if {$rate != 0} {
-            struct::set include destv $valve
+        if {![::cave node exists $valve]} {
+            ::cave node insert $valve
         }
-
-        if {![cave node exists $valve]} {
-            cave node insert $valve
-        }
-        cave node set $valve rate $rate
+        ::cave node set $valve rate $rate
 
         foreach v $valves {
-            if {![cave node exists $v]} {
-                cave node insert $v
+            if {![::cave node exists $v]} {
+                ::cave node insert $v
             }
-            cave arc insert $valve $v
+            ::cave arc insert $valve $v
+        }
+
+        if {$rate != 0} {
+            struct::set include targets $valve
         }
     }
-    cave arc setunweighted 1
+    ::cave arc setunweighted 1
+    set adj [struct::graph::op::FloydWarshall ::cave]
 
-    set adj [struct::graph::op::FloydWarshall cave]
-
-    set time 30
-    set flow 0
-    set dests {AA DD BB JJ HH  EE CC}
-
-    set rest [lassign $dests org]
-    foreach dest $rest {
-        set dist [dict get $adj "$org $dest"]
-        set rate [cave node get $dest rate]
-        set time [- $time 1 $dist]
-        set val [* $rate $time] 
-        incr flow $val
-        puts "$time $org $dest $dist $rate $val $flow"
-        set org $dest
-        struct::set exclude destv $org
-   }
+    puts $targets
+    puts [bestflow AA 30 {} $targets]
 }
 
 run
