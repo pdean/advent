@@ -62,6 +62,7 @@ proc run {} {
     ::cave arc setunweighted 1
     set adj [struct::graph::op::FloydWarshall ::cave]
 
+    ::struct::set include targets AA
     puts $targets
     puts [bestflow AA 30 {} $targets]
 }
