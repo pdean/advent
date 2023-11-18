@@ -1,0 +1,83 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require struct::graph::op
+package require struct::set
+
+proc bestflow {cur time seen targets} {
+    global adj
+
+    ::struct::set include seen $cur
+    ::struct::set subtract targets $seen
+
+    set bestflow 0
+    foreach target $targets {
+        set dist [dict get $adj "$cur $target"]
+        set timeleft [- $time 1 $dist]
+        if {$timeleft > 0} {
+            set rate [cave node get $target rate]
+            set flow [* $rate $timeleft] 
+            set nextflow [bestflow $target $timeleft $seen $targets]
+            incr flow $nextflow
+            if {$flow > $bestflow} {
+                set bestflow $flow
+            }
+        }
+    }
+    return $bestflow
+}
+
+proc run {} {
+    global adj 
+
+    set data [read -nonewline stdin]
+    set data [string map {; " " , " " = " "} $data]
+
+    struct::graph cave
+
+    ::struct::set include targets AA
+
+    foreach line [split $data \n] {
+        set valve [lindex $line 1]
+        set rate [lindex $line 5]
+        set valves [lrange $line 10 end]
+#        puts "$valve $rate $valves"
+
+        if {![cave node exists $valve]} {
+            cave node insert $valve
+        }
+        cave node set $valve rate $rate
+
+        foreach v $valves {
+            if {![cave node exists $v]} {
+                cave node insert $v
+            }
+            cave arc insert $valve $v
+        }
+
+        if {$rate != 0} {
+            struct::set include targets $valve
+        }
+    }
+    cave arc setunweighted 1
+    set fulladj [struct::graph::op::FloydWarshall cave]
+#    puts $fulladj
+    puts [llength $fulladj]
+    set adj [list]
+    foreach {key val} $fulladj {
+        lassign $key at to
+        if {$at in $targets} {
+            lappend adj $key $val
+        }
+    }
+#    puts $adj
+    puts [llength $adj]
+
+    
+
+    puts $targets
+    puts [bestflow AA 30 {} $targets]
+}
+
+run
