@@ -16,7 +16,7 @@ proc bestflow {cur timeleft seen targets} {
         set dist [dict get $adj "$cur $target"]
         set timeleft [- $timeleft 1 $dist]
         if {$timeleft > 0} {
-            set rate [::cave node get $target rate]
+            set rate [cave node get $target rate]
             set flow [* $rate $timeleft] 
             puts "$cur $target $dist $rate $timeleft $flow"
             set nextflow [bestflow $target $timeleft $seen $targets]
@@ -35,7 +35,7 @@ proc run {} {
     set data [read -nonewline stdin]
     set data [string map {; " " , " " = " "} $data]
 
-    struct::graph ::cave
+    struct::graph cave
 
     foreach line [split $data \n] {
         set valve [lindex $line 1]
@@ -43,24 +43,24 @@ proc run {} {
         set valves [lrange $line 10 end]
 #        puts "$valve $rate $valves"
 
-        if {![::cave node exists $valve]} {
-            ::cave node insert $valve
+        if {![cave node exists $valve]} {
+            cave node insert $valve
         }
-        ::cave node set $valve rate $rate
+        cave node set $valve rate $rate
 
         foreach v $valves {
-            if {![::cave node exists $v]} {
-                ::cave node insert $v
+            if {![cave node exists $v]} {
+                cave node insert $v
             }
-            ::cave arc insert $valve $v
+            cave arc insert $valve $v
         }
 
         if {$rate != 0} {
             struct::set include targets $valve
         }
     }
-    ::cave arc setunweighted 1
-    set adj [struct::graph::op::FloydWarshall ::cave]
+    cave arc setunweighted 1
+    set adj [struct::graph::op::FloydWarshall cave]
 
     ::struct::set include targets AA
     puts $targets
