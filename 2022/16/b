@@ -1,0 +1,80 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+
+proc bfs {first} {
+    global distance valves rates links 
+
+    set targets [list $first]
+    lappend targets {*}[dict keys \
+        [dict filter $rates script {valve rate} {
+            != $rate 0}]]
+
+    set distance [list]
+
+    foreach start $targets {
+        set done [list]
+        set todo [list $start 0]
+        dict incr done $start
+
+        while {[llength $todo]} {
+            set todo [lassign $todo cur dist]
+            incr dist
+            foreach new [dict get $links $cur] {
+                if {[dict exists $done $new]} continue
+                lappend todo $new $dist
+                dict incr done $new
+                if {$new in $targets} {
+                    dict set distance "$start $new" $dist
+                }
+            }
+        }
+    }
+    return $targets
+}
+
+proc bestflow {cur time done targets} {
+    global distance rates
+
+    set bestflow 0
+    dict incr done $cur
+    foreach target $targets {
+        if {[dict exists $done $target]} continue
+        set dist [dict get $distance "$cur $target"]
+        set timeleft [- $time 1 $dist]
+        if {$timeleft > 0} {
+            set rate [dict get $rates $target]
+            set flow [* $rate $timeleft] 
+            set nextflow [bestflow $target $timeleft $done $targets]
+            incr flow $nextflow
+            set bestflow [max $bestflow $flow]
+        }
+    }
+    return $bestflow
+}
+
+proc run {} {
+    global valves rates links distance
+
+    set data [read -nonewline stdin]
+    set data [string map {; " " , " " = " "} $data]
+    set valves [list]
+
+    foreach line [split $data \n] {
+        set valve [lindex $line 1]
+        set rate [lindex $line 5]
+        set tunnels [lrange $line 10 end]
+        lappend valves $valve
+        dict set rates $valve $rate
+        dict set links $valve $tunnels
+    }
+
+    set targets [bfs AA]
+    puts [llength $distance]
+    puts $targets
+
+    puts [bestflow AA 30 {} $targets]
+}
+
+run
