@@ -29,55 +29,57 @@ proc bestflow {cur time seen targets} {
 }
 
 proc run {} {
-    global adj 
+    global adj rates links
 
     set data [read -nonewline stdin]
     set data [string map {; " " , " " = " "} $data]
 
-    struct::graph cave
 
-    ::struct::set include targets AA
+    set valves [list]
 
     foreach line [split $data \n] {
         set valve [lindex $line 1]
         set rate [lindex $line 5]
-        set valves [lrange $line 10 end]
-#        puts "$valve $rate $valves"
-
-        if {![cave node exists $valve]} {
-            cave node insert $valve
-        }
-        cave node set $valve rate $rate
-
-        foreach v $valves {
-            if {![cave node exists $v]} {
-                cave node insert $v
-            }
-            cave arc insert $valve $v
-        }
-
-        if {$rate != 0} {
-            struct::set include targets $valve
-        }
+        set tunnels [lrange $line 10 end]
+        lappend valves $valve
+        dict set rates $valve $rate
+        dict set links $valve $tunnels
     }
-    cave arc setunweighted 1
-    set fulladj [struct::graph::op::FloydWarshall cave]
-#    puts $fulladj
-    puts [llength $fulladj]
-    set adj [list]
-    foreach {key val} $fulladj {
-        lassign $key at to
-        if {$at in $targets} {
-            lappend adj $key $val
-        }
-    }
-#    puts $adj
-    puts [llength $adj]
 
-    
-
+    set targets [list AA]
+    lappend targets {*}[dict keys \
+        [dict filter $rates script {valve rate} {
+            != $rate 0}]]
     puts $targets
-    puts [bestflow AA 30 {} $targets]
+
+    set adj [list]
+
+    foreach start $valves {
+        if {$start ni $targets} continue
+        puts "start $start"
+        set done [list]
+        set todo [list $start 0]
+        dict incr done $start
+
+        while [llength $todo] {
+            set todo [lassign $todo cur dist]
+            puts "   to $cur $dist"
+            incr dist
+            foreach new [dict get $links $cur] {
+                if {[dict exists $done $new]} continue
+                lappend todo $new $dist
+                dict incr done $new
+                if {$new in $targets} {
+                    dict set adj "$start $new" $dist
+                }
+            }
+        }
+    }
+
+    puts $adj
+
+
+#    puts [bestflow AA 30 {} $targets]
 }
 
 run
