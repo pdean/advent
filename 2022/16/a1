@@ -2,39 +2,63 @@
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
-package require struct::graph::op
-package require struct::set
 
-proc bestflow {cur time seen targets} {
-    global adj
+proc bfs {first} {
+    global distance valves rates links 
 
-    ::struct::set include seen $cur
-    ::struct::set subtract targets $seen
+    set targets [list $first]
+    lappend targets {*}[dict keys \
+        [dict filter $rates script {valve rate} {
+            != $rate 0}]]
+
+    set distance [list]
+
+    foreach start $targets {
+        set done [list]
+        set todo [list $start 0]
+        dict incr done $start
+
+        while {[llength $todo]} {
+            set todo [lassign $todo cur dist]
+            incr dist
+            foreach new [dict get $links $cur] {
+                if {[dict exists $done $new]} continue
+                lappend todo $new $dist
+                dict incr done $new
+                if {$new in $targets} {
+                    dict set distance "$start $new" $dist
+                }
+            }
+        }
+    }
+    return $targets
+}
+
+proc bestflow {cur time done targets} {
+    global distance rates
 
     set bestflow 0
+    dict incr done $cur
     foreach target $targets {
-        set dist [dict get $adj "$cur $target"]
+        if {[dict exists $done $target]} continue
+        set dist [dict get $distance "$cur $target"]
         set timeleft [- $time 1 $dist]
         if {$timeleft > 0} {
-            set rate [cave node get $target rate]
+            set rate [dict get $rates $target]
             set flow [* $rate $timeleft] 
-            set nextflow [bestflow $target $timeleft $seen $targets]
+            set nextflow [bestflow $target $timeleft $done $targets]
             incr flow $nextflow
-            if {$flow > $bestflow} {
-                set bestflow $flow
-            }
+            set bestflow [max $bestflow $flow]
         }
     }
     return $bestflow
 }
 
 proc run {} {
-    global adj rates links
+    global valves rates links distance
 
     set data [read -nonewline stdin]
     set data [string map {; " " , " " = " "} $data]
-
-
     set valves [list]
 
     foreach line [split $data \n] {
@@ -46,40 +70,11 @@ proc run {} {
         dict set links $valve $tunnels
     }
 
-    set targets [list AA]
-    lappend targets {*}[dict keys \
-        [dict filter $rates script {valve rate} {
-            != $rate 0}]]
+    set targets [bfs AA]
+    puts [llength $distance]
     puts $targets
 
-    set adj [list]
-
-    foreach start $valves {
-        if {$start ni $targets} continue
-        puts "start $start"
-        set done [list]
-        set todo [list $start 0]
-        dict incr done $start
-
-        while [llength $todo] {
-            set todo [lassign $todo cur dist]
-            puts "   to $cur $dist"
-            incr dist
-            foreach new [dict get $links $cur] {
-                if {[dict exists $done $new]} continue
-                lappend todo $new $dist
-                dict incr done $new
-                if {$new in $targets} {
-                    dict set adj "$start $new" $dist
-                }
-            }
-        }
-    }
-
-    puts $adj
-
-
-#    puts [bestflow AA 30 {} $targets]
+    puts [bestflow AA 30 {} $targets]
 }
 
 run
