@@ -83,20 +83,6 @@ proc run {} {
     visit AA 30 0 0 
     puts [max {*}[dict values $answer]]
     
-    set answer [list]
-    visit AA 26 0 0 
-
-    set res 0
-    dict for {key1 val1} $answer {
-        dict for {key2 val2} $answer {
-            if {![& $key1 $key2]} {
-                set res [max $res [+ $val1 $val2]]
-            }
-        }
-    }
-
-    puts $res
-
 }
 
 run

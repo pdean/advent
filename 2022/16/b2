@@ -77,12 +77,6 @@ proc run {} {
             != $rate 0}]
 
     floyd
-    set answer [list]
-    visit AA 30 0 0 
-    puts [/ [llength $answer] 2]
-    puts [max {*}[dict values $answer]]
-    
-    puts ""
 
     set answer [list]
     visit AA 26 0 0 
