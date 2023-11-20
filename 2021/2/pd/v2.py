@@ -1,0 +1,22 @@
+# vim: sts=4 sw=4 tw=80 et:
+data = [line.strip().split() for line in open('input.txt')]
+
+f = d = 0
+for k,v in data:
+    v = int(v)
+    if k == 'forward': f+=v
+    elif k == 'up': d-=v
+    elif k == 'down': d+=v
+print(f*d)		
+
+a = f = d = 0
+for k,v in data:
+    v = int(v)
+    if k == 'forward': f+=v; d+=a*v
+    elif k == 'up': a-=v
+    elif k == 'down': a+=v
+print(f*d)		
+		
+	    
+		
+    
