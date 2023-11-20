@@ -29,6 +29,9 @@ proc run {} {
 
     set data [read -nonewline stdin]
     set cubes [lmap l [split $data \n] {split $l ,}]
+    foreach cube $cubes {
+        dict incr drop $cube
+    }
 
     set minv [- [min {*}[concat {*}$cubes]] 1]
     set maxv [+ [max {*}[concat {*}$cubes]] 1]
@@ -41,9 +44,9 @@ proc run {} {
 
     while {[llength $todo]} {
         set todo [lassign $todo node]
-        foreach n [nb $node] {
-            if {$n in $done} continue
-            if {$n in $cubes} {
+        foreach n [nb $node]  {
+            if {[dict exists $done $n]} continue
+            if {[dict exists $drop $n]} {
                 incr sides
             } else {
                 lappend todo $n
