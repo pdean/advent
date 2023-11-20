@@ -1,0 +1,53 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+
+#floyd-warshall
+proc floyd {} {
+    global distance valves links
+    foreach u $valves {
+        foreach v $valves {
+            dict set distance "$u $v" Inf
+        }
+        dict set distance "$u $u" 0
+        foreach v [dict get $links $u] {
+            dict set distance "$u $v" 1
+        }
+    }
+    foreach k $valves {
+        foreach u $valves {
+            foreach v $valves {
+                set uk [dict get $distance "$u $k"]
+                set kv [dict get $distance "$k $v"]
+                set uv [dict get $distance "$u $v"]
+                dict set distance "$u $v" \
+                    [min $uv [+ $uk $kv]]
+            }
+        }
+    }
+}
+
+proc run {} {
+    global distance valves links
+
+    set data [read -nonewline stdin]
+    set data [string map {; " " , " " = " "} $data]
+    set valves [list]
+
+    foreach line [split $data \n] {
+        set valve [lindex $line 1]
+        set rate [lindex $line 5]
+        set tunnels [lrange $line 10 end]
+        lappend valves $valve
+        dict set rates $valve $rate
+        dict set links $valve $tunnels
+    }
+
+    floyd
+    puts [llength $valves]
+    puts [llength $distance]
+    
+}
+
+run
