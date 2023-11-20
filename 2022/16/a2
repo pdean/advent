@@ -31,7 +31,7 @@ proc floyd {} {
 
 # dfs
 proc visit {valve time bitmask pressure} {
-    global distance index links rates valves answer targets
+    global distance index answer targets
 
     if {![dict exists $answer $bitmask]} {
         dict set answer $bitmask $pressure 
@@ -79,10 +79,24 @@ proc run {} {
             != $rate 0}]
 
     floyd
-    set answer [list 0 0]
+    set answer [list]
     visit AA 30 0 0 
-    puts [llength [dict keys $answer]]
     puts [max {*}[dict values $answer]]
+    
+    set answer [list]
+    visit AA 26 0 0 
+
+    set res 0
+    dict for {key1 val1} $answer {
+        dict for {key2 val2} $answer {
+            if {![& $key1 $key2]} {
+                set res [max $res [+ $val1 $val2]]
+            }
+        }
+    }
+
+    puts $res
+
 }
 
 run
