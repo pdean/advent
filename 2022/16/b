@@ -6,14 +6,16 @@ namespace path [list ::tcl::mathop ::tcl::mathfunc]
 proc bfs {first} {
     global distance valves rates links targets
 
-    set targets [list $first]
+    set targets [list]
     lappend targets {*}[dict keys \
         [dict filter $rates script {valve rate} {
             != $rate 0}]]
 
     set distance [list]
+    set dtargets $targets
+    lappend dtargets $first
 
-    foreach start $targets {
+    foreach start $dtargets {
         set done [list]
         set todo [list $start 0]
         dict incr done $start
@@ -53,6 +55,43 @@ proc bestflow {cur time done } {
     return $res
 }
 
+
+proc bestflow2 {cur1 time1 cur2 time2 done } {
+    global distance rates targets
+
+    puts "$cur1 $time1 $cur2 $time2 $done"
+
+    set res 0
+    foreach target $targets {
+        if {$target in $done} continue
+
+        set newdone [concat $done $target]
+        
+
+        set dist [dict get $distance "$cur1 $target"]
+        set timeleft [- $time1 1 $dist]
+        if {$timeleft > 0} {
+            set rate [dict get $rates $target]
+            set flow [* $rate $timeleft] 
+            set nextflow [bestflow2 $target $timeleft $cur2 $time2 $newdone ]
+            incr flow $nextflow
+            set res [max $res $flow]
+        }
+
+        set dist [dict get $distance "$cur2 $target"]
+        set timeleft [- $time2 1 $dist]
+        if {$timeleft > 0} {
+            set rate [dict get $rates $target]
+            set flow [* $rate $timeleft] 
+            set nextflow [bestflow2 $cur1 $time1 $target $timeleft $newdone ]
+            incr flow $nextflow
+            set res [max $res $flow]
+        }
+
+    }
+    return $res
+}
+
 proc run {} {
     global valves rates links distance targets
 
@@ -71,6 +110,8 @@ proc run {} {
 
     bfs AA
     puts [bestflow AA 30 {} ]
+
+    puts [bestflow2 AA 26 AA 26 {} ]
 }
 
 run
