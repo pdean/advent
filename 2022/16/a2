@@ -9,20 +9,20 @@ proc floyd {} {
     global distance valves links
     foreach u $valves {
         foreach v $valves {
-            dict set distance "$u $v" Inf
+            dict set distance $u,$v Inf
         }
-        dict set distance "$u $u" 0
+        dict set distance $u,$u 0
         foreach v [dict get $links $u] {
-            dict set distance "$u $v" 1
+            dict set distance $u,$v 1
         }
     }
     foreach k $valves {
         foreach u $valves {
             foreach v $valves {
-                set uk [dict get $distance "$u $k"]
-                set kv [dict get $distance "$k $v"]
-                set uv [dict get $distance "$u $v"]
-                dict set distance "$u $v" \
+                set uk [dict get $distance $u,$k]
+                set kv [dict get $distance $k,$v]
+                set uv [dict get $distance $u,$v]
+                dict set distance $u,$v \
                     [min $uv [+ $uk $kv]]
             }
         }
@@ -43,7 +43,7 @@ proc visit {valve time bitmask pressure} {
     dict for {valve2 rate} $targets {
         set bits [dict get $index $valve2]
         if { [& $bitmask $bits] } continue
-        set dist [dict get $distance "$valve $valve2"]
+        set dist [dict get $distance $valve,$valve2]
         set timeleft [- $time 1 $dist]
         if {$timeleft > 0} {
             visit $valve2 $timeleft [| $bitmask $bits] \
