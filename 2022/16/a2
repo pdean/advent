@@ -1,5 +1,6 @@
 #!/usr/bin/env tclsh
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
+# see gravitars solution
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
 
@@ -28,8 +29,31 @@ proc floyd {} {
     }
 }
 
+# dfs
+proc visit {valve time bitmask pressure} {
+    global distance index links rates valves answer targets
+
+    if {![dict exists $answer $bitmask]} {
+        dict set answer $bitmask $pressure 
+    } else {
+        dict set answer $bitmask \
+            [max $pressure [dict get $answer $bitmask]]
+    } 
+
+    dict for {valve2 rate} $targets {
+        set bits [dict get $index $valve2]
+        if { [& $bitmask $bits] } continue
+        set dist [dict get $distance "$valve $valve2"]
+        set timeleft [- $time 1 $dist]
+        if {$timeleft > 0} {
+            visit $valve2 $timeleft [| $bitmask $bits] \
+                [+ $pressure [* $timeleft $rate]]
+        }
+    }
+}
+
 proc run {} {
-    global distance valves links
+    global distance valves links index targets answer
 
     set data [read -nonewline stdin]
     set data [string map {; " " , " " = " "} $data]
@@ -44,10 +68,21 @@ proc run {} {
         dict set links $valve $tunnels
     }
 
+    set n [llength $valves]
+    for {set i 0} {$i < $n} {incr i} {
+        set bits [<< 1 $i]
+        set valve [lindex $valves $i]
+        dict set index $valve $bits
+    }
+
+    set targets [dict filter $rates script {valve rate} {
+            != $rate 0}]
+
     floyd
-    puts [llength $valves]
-    puts [llength $distance]
-    
+    set answer [list 0 0]
+    visit AA 30 0 0 
+    puts [llength [dict keys $answer]]
+    puts [max {*}[dict values $answer]]
 }
 
 run
