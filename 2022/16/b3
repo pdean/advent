@@ -12,7 +12,7 @@ proc floyd {} {
             set distance($u,$v) Inf
         }
         set distance($u,$u) 0
-        foreach v $links($u)] {
+        foreach v $links($u) {
             set distance($u,$v) 1
         }
     }
