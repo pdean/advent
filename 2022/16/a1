@@ -36,7 +36,7 @@ proc bfs {first} {
 proc bestflow {cur time done } {
     global distance rates targets
 
-    set bestflow 0
+    set res 0
     dict incr done $cur
     foreach target $targets {
         if {[dict exists $done $target]} continue
@@ -47,10 +47,10 @@ proc bestflow {cur time done } {
             set flow [* $rate $timeleft] 
             set nextflow [bestflow $target $timeleft $done ]
             incr flow $nextflow
-            set bestflow [max $bestflow $flow]
+            set res [max $res $flow]
         }
     }
-    return $bestflow
+    return $res
 }
 
 proc run {} {
