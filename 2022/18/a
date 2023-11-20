@@ -1,0 +1,18 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+namespace import ::textutil::split*
+
+proc run {} {
+
+    set data [read -nonewline stdin]
+
+    set cubes [lmap l [split $data \n] {split $l ,}]
+    puts $cubes
+
+}
+
+run
