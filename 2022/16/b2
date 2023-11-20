@@ -42,13 +42,11 @@ proc visit {valve time bitmask pressure} {
 
     dict for {valve2 rate} $targets {
         set bits [dict get $index $valve2]
-        if { [& $bitmask $bits] } continue
         set dist [dict get $distance "$valve $valve2"]
         set timeleft [- $time 1 $dist]
-        if {$timeleft > 0} {
-            visit $valve2 $timeleft [| $bitmask $bits] \
+        if {$timeleft <= 0 || [& $bitmask $bits]  } continue
+        visit $valve2 $timeleft [| $bitmask $bits] \
                 [+ $pressure [* $timeleft $rate]]
-        }
     }
 }
 
@@ -81,10 +79,14 @@ proc run {} {
     floyd
     set answer [list]
     visit AA 30 0 0 
+    puts [/ [llength $answer] 2]
     puts [max {*}[dict values $answer]]
     
+    puts ""
+
     set answer [list]
     visit AA 26 0 0 
+    puts [/ [llength $answer] 2]
 
     set res 0
     dict for {key1 val1} $answer {
