@@ -4,7 +4,7 @@
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
 
 proc bfs {first} {
-    global distance valves rates links 
+    global distance valves rates links targets
 
     set targets [list $first]
     lappend targets {*}[dict keys \
@@ -31,11 +31,10 @@ proc bfs {first} {
             }
         }
     }
-    return $targets
 }
 
-proc bestflow {cur time done targets} {
-    global distance rates
+proc bestflow {cur time done } {
+    global distance rates targets
 
     set bestflow 0
     dict incr done $cur
@@ -46,7 +45,7 @@ proc bestflow {cur time done targets} {
         if {$timeleft > 0} {
             set rate [dict get $rates $target]
             set flow [* $rate $timeleft] 
-            set nextflow [bestflow $target $timeleft $done $targets]
+            set nextflow [bestflow $target $timeleft $done ]
             incr flow $nextflow
             set bestflow [max $bestflow $flow]
         }
@@ -55,7 +54,7 @@ proc bestflow {cur time done targets} {
 }
 
 proc run {} {
-    global valves rates links distance
+    global valves rates links distance targets
 
     set data [read -nonewline stdin]
     set data [string map {; " " , " " = " "} $data]
@@ -70,11 +69,8 @@ proc run {} {
         dict set links $valve $tunnels
     }
 
-    set targets [bfs AA]
-    puts [llength $distance]
-    puts $targets
-
-    puts [bestflow AA 30 {} $targets]
+    bfs AA
+    puts [bestflow AA 30 {} ]
 }
 
 run
