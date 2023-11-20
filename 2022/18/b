@@ -6,23 +6,57 @@ package require fileutil
 package require textutil
 namespace import ::textutil::split*
 
+set dp {-1 0 0  1 0 0
+        0 -1 0  0 1 0
+        0 0 -1  0 0 1}
+
+proc nb {p} {
+    global minv maxv dp
+
+    set nb [list]
+    lassign $p x y z
+    foreach {dx dy dz} $dp {
+       set nx [+ $x $dx] 
+       set ny [+ $y $dy] 
+       set nz [+ $z $dz] 
+       if {[min $nx $ny $nz] < $minv} continue
+       if {[max $nx $ny $nz] > $maxv} continue
+       lappend nb [list $nx $ny $nz]
+   }
+   return $nb
+}
+
+
 proc run {} {
+    global minv maxv
 
     set data [read -nonewline stdin]
     set cubes [lmap l [split $data \n] {split $l ,}]
-    set faces [* 6 [llength $cubes]]
 
-    foreach a $cubes {
-        foreach b $cubes {
-            foreach {x1 y1 z1} $a {x2 y2 z2} $b {
-                set sum [+ [abs [- $x2 $x1]] [abs [- $y2 $y1]] [abs [- $z2 $z1]]] 
-                if {$sum == 1} {
-                    incr faces -1
-                }
+    set minv [- [min {*}[concat {*}$cubes]] 1]
+    set maxv [+ [max {*}[concat {*}$cubes]] 1]
+    puts "$minv $maxv"
+
+    set p0 [list $minv $minv $minv]
+    set todo [list]
+    lappend todo $p0
+    dict incr done $p0
+
+    while {[llength $todo]} {
+        set todo [lassign $todo node]
+        foreach n [nb $node] {
+            if {$n in $done} continue
+            if {$n in $cubes} {
+                incr sides
+            } else {
+                lappend todo $n
+                dict incr done $n
             }
         }
     }
-    puts $faces
+
+    puts $sides
+
 }
 
 run
