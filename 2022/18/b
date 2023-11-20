@@ -3,9 +3,6 @@
 # cheat off gravitar64 again
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
-package require fileutil
-package require textutil
-namespace import ::textutil::split*
 
 set dp {-1 0 0  1 0 0
         0 -1 0  0 1 0
@@ -27,7 +24,6 @@ proc nb {p} {
    return $nb
 }
 
-
 proc run {} {
     global minv maxv
 
@@ -38,10 +34,10 @@ proc run {} {
     set maxv [+ [max {*}[concat {*}$cubes]] 1]
     puts "$minv $maxv"
 
-    set p0 [list $minv $minv $minv]
+    set p [list $minv $minv $minv]
     set todo [list]
-    lappend todo $p0
-    dict incr done $p0
+    lappend todo $p
+    dict incr done $p
 
     while {[llength $todo]} {
         set todo [lassign $todo node]
@@ -57,7 +53,6 @@ proc run {} {
     }
 
     puts $sides
-
 }
 
 run
