@@ -3,6 +3,14 @@
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
 
+proc score {bp} {
+    lassign $bp _ 
+
+
+
+
+}
+
 proc run {} {
 
     set data [read -nonewline stdin]
@@ -12,7 +20,10 @@ proc run {} {
                 
     puts [join $lines \n]
 
-
+    foreach bp $lines {
+        lassign $bp num
+        puts "$num [score $bp]"
+    }
 }
 
 run
