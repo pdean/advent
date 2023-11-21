@@ -2,13 +2,16 @@
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
-package require fileutil
-package require textutil
-namespace import ::textutil::split*
 
 proc run {} {
 
     set data [read -nonewline stdin]
+    set lines [lmap l [split $data \n] {
+        set n [regsub -all {[^\d]} $l " "]
+        list {*}$n}]
+                
+    puts [join $lines \n]
+
 
 }
 
