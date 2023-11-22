@@ -1,28 +1,77 @@
 #!/usr/bin/env tclsh
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
+# cheat from paulson
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
 
-proc score {bp} {
-    lassign $bp _ 
+proc score {blueprint time} {
+    lassign $blueprint bp \
+        oo co bo bc go gb
+    set mo [max $oo $co $bo $go]
+
+    set init [list 1 0 0 0  0 0 0 0  $time]
+    set todo [list $init]
+    set done [list]
+    set times [list]
+    set best 0
+
+    while {[llength $todo]} {
+        set todo [lassign $todo state]
+        lassign $state ro rc rb rg o c b g t
+        
+        if {![dict exists $times $t]} {
+            dict incr times $t
+            puts "$bp $t [llength $todo]"
+        }
+
+        set best [max $best $g]
+        if {$t == 0} continue
+
+        set o [expr {min($o, $mo + ($mo - $ro) * ($t - 1))}]
+        set c [expr {min($c, $bc + ($bc - $rc) * ($t - 1))}]
+        set b [expr {min($b, $gb + ($gb - $rb) * ($t - 1))}]
 
 
+        set state [list $ro $rc $rb $rg $o $c $b $g $t]
+        if {[dict exists $done $state]} continue
+        dict incr done $state
 
+        if {$o >= $oo && $ro < $mo} {
+            lappend todo [list [+ $ro 1] $rc $rb $rg \
+                [+ $o -$oo $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]  
+                            
+        }
+        if {$o >= $co && $rc < $bc} {
+            lappend todo [list $ro [+ $rc 1] $rb $rg \
+                [+ $o -$co $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
+        }
+        if {$o >= $bo && $c >= $bc  && $rb < $gb} {
+            lappend todo [list $ro $rc [+ $rb 1] $rg \
+                [+ $o -$bo $ro] [+ $c -$bc $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
+        }
+        if {$o >= $go && $b >= $gb} {
+            lappend todo [list $ro $rc $rb [+ $rg 1] \
+                [+ $o -$go $ro] [+ $c $rc] [+ $b -$gb $rb] [+ $g $rg] [- $t 1]]
+        }
+        lappend todo [list $ro $rc $rb $rg \
+            [+ $o $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
+    }
 
+    return $best
 }
 
 proc run {} {
 
     set data [read -nonewline stdin]
-    set lines [lmap l [split $data \n] {
+    set blueprints [lmap l [split $data \n] {
         set n [regsub -all {[^\d]} $l " "]
         list {*}$n}]
                 
-    puts [join $lines \n]
 
-    foreach bp $lines {
-        lassign $bp num
-        puts "$num [score $bp]"
+    foreach blueprint $blueprints {
+        puts $blueprint
+        lassign $blueprint num
+        puts "$num [score $blueprint 24]"
     }
 }
 
