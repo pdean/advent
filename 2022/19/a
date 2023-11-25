@@ -1,6 +1,6 @@
 #!/usr/bin/env tclsh
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
-# cheat from paulson
+# cheat from paulson and grossgrass
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
 package require struct::queue
@@ -13,18 +13,12 @@ proc score {blueprint time} {
     set todo [::struct::queue]
     $todo put $init
     set done [list]
-    set times [list]
     set best 0
 
     while {[$todo size]} {
         set state [$todo get]
         lassign $state ro rc rb rg o c b g t
         
-#        if {![dict exists $times $t]} {
-#            dict incr times $t
-#            puts "$bp $t [llength $todo]"
-#        }
-
         set best [max $best $g]
         if {$t == 0} continue
 
@@ -58,7 +52,7 @@ proc score {blueprint time} {
             $todo put [list $ro $rc [+ $rb 1] $rg \
                 [+ $o -$bo $ro] [+ $c -$bc $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
         }
-        #
+        
         # build geode
         if {$o >= $go && $b >= $gb} {
             $todo put [list $ro $rc $rb [+ $rg 1] \
