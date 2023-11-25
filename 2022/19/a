@@ -5,8 +5,7 @@
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
 
 proc score {blueprint time} {
-    lassign $blueprint bp \
-        oo co bo bc go gb
+    lassign $blueprint bp oo co bo bc go gb
     set mo [max $oo $co $bo $go]
 
     set init [list 1 0 0 0  0 0 0 0  $time]
@@ -27,36 +26,37 @@ proc score {blueprint time} {
         set best [max $best $g]
         if {$t == 0} continue
 
-        if {$g + $t * $g + max(($t - 2) * ($t - 1) / 2, 0) < $best} {
-            continue
-        }
-
-        set o [expr {min($o, $mo + ($mo - $ro) * ($t - 1))}]
-        set c [expr {min($c, $bc + ($bc - $rc) * ($t - 1))}]
-        set b [expr {min($b, $gb + ($gb - $rb) * ($t - 1))}]
-
-
-        set state [list $ro $rc $rb $rg $o $c $b $g $t]
         if {[dict exists $done $state]} continue
         dict incr done $state
 
+        # build geode
+        if {$o >= $go && $b >= $gb} {
+            lappend todo [list $ro $rc $rb [+ $rg 1] \
+                [+ $o -$go $ro] [+ $c $rc] [+ $b -$gb $rb] [+ $g $rg] [- $t 1]]
+            continue
+        }
+
+        # build obsidian
+        if {$o >= $bo && $c >= $bc  && $rb < $gb} {
+            lappend todo [list $ro $rc [+ $rb 1] $rg \
+                [+ $o -$bo $ro] [+ $c -$bc $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
+            continue
+        }
+        
+        # build clay
+        if {$o >= $co && $rc < $bc} {
+            lappend todo [list $ro [+ $rc 1] $rb $rg \
+                [+ $o -$co $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
+        }
+
+        # build ore
         if {$o >= $oo && $ro < $mo} {
             lappend todo [list [+ $ro 1] $rc $rb $rg \
                 [+ $o -$oo $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]  
                             
         }
-        if {$o >= $co && $rc < $bc} {
-            lappend todo [list $ro [+ $rc 1] $rb $rg \
-                [+ $o -$co $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
-        }
-        if {$o >= $bo && $c >= $bc  && $rb < $gb} {
-            lappend todo [list $ro $rc [+ $rb 1] $rg \
-                [+ $o -$bo $ro] [+ $c -$bc $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
-        }
-        if {$o >= $go && $b >= $gb} {
-            lappend todo [list $ro $rc $rb [+ $rg 1] \
-                [+ $o -$go $ro] [+ $c $rc] [+ $b -$gb $rb] [+ $g $rg] [- $t 1]]
-        }
+
+        # build nothing
         lappend todo [list $ro $rc $rb $rg \
             [+ $o $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
     }
