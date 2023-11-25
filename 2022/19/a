@@ -3,24 +3,26 @@
 # cheat from paulson
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require struct::queue
 
 proc score {blueprint time} {
     lassign $blueprint bp oo co bo bc go gb
     set mo [max $oo $co $bo $go]
 
     set init [list 1 0 0 0  0 0 0 0  $time]
-    set todo [list $init]
+    set todo [::struct::queue]
+    $todo put $init
     set done [list]
     set times [list]
     set best 0
 
-    while {[llength $todo]} {
-        set todo [lassign $todo state]
+    while {[$todo size]} {
+        set state [$todo get]
         lassign $state ro rc rb rg o c b g t
         
         if {![dict exists $times $t]} {
             dict incr times $t
-            puts "$bp $t [llength $todo]"
+            puts "$bp $t [$todo size]"
         }
 
         set best [max $best $g]
@@ -31,34 +33,33 @@ proc score {blueprint time} {
 
         # build geode
         if {$o >= $go && $b >= $gb} {
-            lappend todo [list $ro $rc $rb [+ $rg 1] \
+            $todo put [list $ro $rc $rb [+ $rg 1] \
                 [+ $o -$go $ro] [+ $c $rc] [+ $b -$gb $rb] [+ $g $rg] [- $t 1]]
             continue
         }
 
         # build obsidian
         if {$o >= $bo && $c >= $bc  && $rb < $gb} {
-            lappend todo [list $ro $rc [+ $rb 1] $rg \
+            $todo put [list $ro $rc [+ $rb 1] $rg \
                 [+ $o -$bo $ro] [+ $c -$bc $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
             continue
         }
         
         # build clay
         if {$o >= $co && $rc < $bc} {
-            lappend todo [list $ro [+ $rc 1] $rb $rg \
+            $todo put [list $ro [+ $rc 1] $rb $rg \
                 [+ $o -$co $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
         }
 
         # build ore
         if {$o >= $oo && $ro < $mo} {
-            lappend todo [list [+ $ro 1] $rc $rb $rg \
+            $todo put [list [+ $ro 1] $rc $rb $rg \
                 [+ $o -$oo $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]  
                             
         }
 
         # build nothing
-        lappend todo [list $ro $rc $rb $rg \
-            [+ $o $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
+        $todo put [list $ro $rc $rb $rg [+ $o $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
     }
 
     return $best
