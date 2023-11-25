@@ -71,13 +71,13 @@ proc run {} {
         list {*}$n}]
                 
 
-    set sum 0
-    foreach blueprint $blueprints {
+    set prod 1
+    foreach blueprint [lrange $blueprints 0 2] {
         puts $blueprint
         lassign $blueprint num
-        set score [score $blueprint 24]
+        set score [score $blueprint 32]
         puts "$num $score"
-        incr sum [* $num $score]
+        incr prod [* $prod $score]
     }
     puts $sum
 }
