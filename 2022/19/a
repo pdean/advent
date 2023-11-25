@@ -53,7 +53,8 @@ proc score {blueprint time} {
         }
 
         # build nothing
-        $todo put [list $ro $rc $rb $rg [+ $o $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
+        $todo put [list $ro $rc $rb $rg \
+                [+ $o $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
     }
 
     return $best
