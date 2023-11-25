@@ -1,0 +1,94 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+# cheat from paulson and grossgrass
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require struct::queue
+package require struct::set
+
+proc score {blueprint time} {
+    lassign $blueprint bp oo co bo bc go gb
+    set mo [max $oo $co $bo $go]
+
+    set init [list 1 0 0 0  0 0 0 0  $time]
+    set todo [::struct::queue]
+    $todo put $init
+    set done [list]
+    set best 0
+
+    while {[$todo size]} {
+        set state [$todo get]
+        lassign $state ro rc rb rg o c b g t
+        
+        set best [max $best $g]
+        if {$t == 0} continue
+
+#        set o [expr {min($o, $mo + ($mo - $ro) * ($t - 1))}]
+#        set c [expr {min($c, $bc + ($bc - $rc) * ($t - 1))}]
+#        set b [expr {min($b, $gb + ($gb - $rb) * ($t - 1))}]
+
+        set ro [min $ro $mo]
+        set rc [min $rc $bc]
+        set rb [min $rb $gb]
+
+        set o [min $o [- [* $mo $t] [* $ro [- $t 1]]]]
+        set c [min $c [- [* $bc $t] [* $rc [- $t 1]]]]
+        set b [min $b [- [* $gb $t] [* $rb [- $t 1]]]]
+
+        set state [list $ro $rc $rb $rg $o $c $b $g $t]
+
+        if {[::struct::set contains $done $state]} continue
+        ::struct::set include done  $state
+
+        # build nothing
+        $todo put [list $ro $rc $rb $rg \
+                [+ $o $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
+
+        # build ore
+        if {$o >= $oo && $ro < $mo} {
+            $todo put [list [+ $ro 1] $rc $rb $rg \
+                [+ $o -$oo $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]  
+        }
+        
+        # build clay
+        if {$o >= $co && $rc < $bc} {
+            $todo put [list $ro [+ $rc 1] $rb $rg \
+                [+ $o -$co $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
+        }
+
+        # build obsidian
+        if {$o >= $bo && $c >= $bc  && $rb < $gb} {
+            $todo put [list $ro $rc [+ $rb 1] $rg \
+                [+ $o -$bo $ro] [+ $c -$bc $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
+        }
+        
+        # build geode
+        if {$o >= $go && $b >= $gb} {
+            $todo put [list $ro $rc $rb [+ $rg 1] \
+                [+ $o -$go $ro] [+ $c $rc] [+ $b -$gb $rb] [+ $g $rg] [- $t 1]]
+        }
+    }
+
+    return $best
+}
+
+proc run {} {
+
+    set data [read -nonewline stdin]
+    set blueprints [lmap l [split $data \n] {
+        set n [regsub -all {[^\d]} $l " "]
+        list {*}$n}]
+                
+
+    set sum 0
+    foreach blueprint $blueprints {
+        puts $blueprint
+        lassign $blueprint num
+        set score [score $blueprint 24]
+        puts "$num $score"
+        incr sum [* $num $score]
+    }
+    puts $sum
+}
+
+run
