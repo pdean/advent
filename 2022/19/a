@@ -13,18 +13,12 @@ proc score {blueprint time} {
     set todo [::struct::queue]
     $todo put $init
     set done [list]
-    set times [list]
     set best 0
 
     while {[$todo size]} {
         set state [$todo get]
         lassign $state ro rc rb rg o c b g t
         
-        if {![dict exists $times $t]} {
-            dict incr times $t
-            puts "$bp $t [$todo size]"
-        }
-
         set best [max $best $g]
         if {$t == 0} continue
 
@@ -73,11 +67,15 @@ proc run {} {
         list {*}$n}]
                 
 
+    set sum 0
     foreach blueprint $blueprints {
         puts $blueprint
         lassign $blueprint num
-        puts "$num [score $blueprint 24]"
+        set score [score $blueprint 24]
+        puts "$num $score"
+        incr sum [* $num $score]
     }
+    puts $sum
 }
 
 run
