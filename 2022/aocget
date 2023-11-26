@@ -1,2 +1,2 @@
 #!/bin/sh
-aoc d  -y 2022 -d 16
+aoc d  -y 2022 -d x 
