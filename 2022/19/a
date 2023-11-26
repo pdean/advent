@@ -31,6 +31,13 @@ proc score {blueprint time} {
         if {[dict exists $done $state]} continue
         dict incr done $state
 
+        # build geode
+        if {$o >= $go && $b >= $gb} {
+            $todo put [list $ro $rc $rb [+ $rg 1] \
+                [+ $o -$go $ro] [+ $c $rc] [+ $b -$gb $rb] [+ $g $rg] [- $t 1]]
+            continue
+        }
+
         # build nothing
         $todo put [list $ro $rc $rb $rg \
                 [+ $o $ro] [+ $c $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
@@ -51,12 +58,6 @@ proc score {blueprint time} {
         if {$o >= $bo && $c >= $bc  && $rb < $gb} {
             $todo put [list $ro $rc [+ $rb 1] $rg \
                 [+ $o -$bo $ro] [+ $c -$bc $rc] [+ $b $rb] [+ $g $rg] [- $t 1]]
-        }
-        
-        # build geode
-        if {$o >= $go && $b >= $gb} {
-            $todo put [list $ro $rc $rb [+ $rg 1] \
-                [+ $o -$go $ro] [+ $c $rc] [+ $b -$gb $rb] [+ $g $rg] [- $t 1]]
         }
     }
 

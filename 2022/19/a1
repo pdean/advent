@@ -23,10 +23,6 @@ proc score {blueprint time} {
         set best [max $best $g]
         if {$t == 0} continue
 
-#        set o [expr {min($o, $mo + ($mo - $ro) * ($t - 1))}]
-#        set c [expr {min($c, $bc + ($bc - $rc) * ($t - 1))}]
-#        set b [expr {min($b, $gb + ($gb - $rb) * ($t - 1))}]
-
         set ro [min $ro $mo]
         set rc [min $rc $bc]
         set rb [min $rb $gb]
