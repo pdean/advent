@@ -2,11 +2,10 @@
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
 
 proc run {} {
-
     set data [read -nonewline stdin]
     set lines [split $data \n]
     
-    set m {one 1 six 6 two 2 five 5 four 4 nine 9 eight 8 seven 7 three 3 }
+    set m {one 1 two 2 three 3 four 4 five 5 six 6 seven 7 eight 8 nine 9 }
     set n [list]
     foreach {w d} $m {
         set v [string reverse $w]
@@ -18,16 +17,11 @@ proc run {} {
         set r [string reverse $l]
         set l [string map $m $l]
         set r [string map $n $r]
-        
-        set dl [regexp -all -inline {\d} $l]
-        set dr [regexp -all -inline {\d} $r]
-        set d1 [lindex $dl 0]
-        set d2 [lindex $dr 0]
+        regexp  {(\d)} $l -> d1
+        regexp  {(\d)} $r -> d2
         set p [expr {10*$d1+$d2}]
         incr sum $p
     }
     puts $sum
-
 }
-
 run
