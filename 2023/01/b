@@ -1,22 +1,19 @@
 #!/usr/bin/env tclsh
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
 
-namespace path [list ::tcl::mathop ::tcl::mathfunc]
-package require fileutil
-package require textutil
-namespace import ::textutil::split*
-
 proc run {} {
 
     set data [read -nonewline stdin]
+    
+    set m {one 1 two 2 three 3 four 4 five 5 six 6 seven 7 eight 8 nine 9}
+    set n [string map -nocase $m $data]
 
     set sum 0
-
-    foreach l [split $data \n] {
+    foreach l [split $n \n] {
         set d [regexp -all -inline {\d} $l]
         set d1 [lindex $d 0]
         set d2 [lindex $d end]
-        set p [+ $d2 [* 10 $d1]]
+        set p [expr {10*$d1+$d2}]
         incr sum $p
     }
     puts $sum
