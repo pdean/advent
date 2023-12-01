@@ -1,0 +1,30 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+proc run {} {
+
+    set data [read -nonewline stdin]
+    set lines [split $data \n]
+    
+    set m {one 1 six 6 two 2 five 5 four 4 nine 9 eight 8 seven 7 three 3 }
+    set n [list]
+    foreach {w d} $m {
+        set v [string reverse $w]
+        lappend n $v $d
+    }
+
+    set sum 0
+    foreach l $lines {
+        set r [string reverse $l]
+        set l [string map $m $l]
+        set r [string map $n $r]
+        regexp  {(\d)} $l -> d1
+        regexp  {(\d)} $r -> d2
+        set p [expr {10*$d1+$d2}]
+        incr sum $p
+    }
+    puts $sum
+
+}
+
+run
