@@ -1,26 +1,26 @@
 #!/usr/bin/env tclsh
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
 
-    proc run {} {
-        set data [read -nonewline stdin]
-        set lines [split $data \n]
-        set cubes {red 12 green 13 blue 14}
+proc run {} {
+    set data [read -nonewline stdin]
+    set lines [split $data \n]
+    set cubes {red 12 green 13 blue 14}
 
-        foreach l $lines {
-            lassign [split $l :] label draws
-            lassign $label -> game
-            set draws [split $draws \;]
-            set fail 0
-            foreach draw $draws {
-                foreach item [split $draw ,] {
-                    lassign $item num col
-                    if {$num > [dict get $cubes $col]} { 
-                        incr fail 
-                    }
+    foreach l $lines {
+        lassign [split $l :] label draws
+        lassign $label -> game
+        set draws [split $draws \;]
+        set fail 0
+        foreach draw $draws {
+            foreach item [split $draw ,] {
+                lassign $item num col
+                if {$num > [dict get $cubes $col]} { 
+                    incr fail 
                 }
             }
-            if {!$fail} { incr sum $game }
         }
-        puts $sum
+        if {!$fail} { incr sum $game }
     }
-    run
+    puts $sum
+}
+run

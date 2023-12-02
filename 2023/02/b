@@ -1,29 +1,29 @@
 #!/usr/bin/env tclsh
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
 
-    namespace path ::tcl::mathop 
+namespace path ::tcl::mathop 
 
-    proc run {} {
-        set data [read -nonewline stdin]
-        set lines [split $data \n]
+proc run {} {
+    set data [read -nonewline stdin]
+    set lines [split $data \n]
 
-        foreach l $lines {
-            set cubes {red 0 green 0 blue 0}
-            lassign [split $l :] label draws
-            lassign $label junk game
-            set draws [split $draws \;]
-            foreach draw $draws {
-                foreach item [split $draw ,] {
-                    lassign $item num col
-                    if {$num > [dict get $cubes $col]} {
-                        dict set cubes $col $num
-                    }
+    foreach l $lines {
+        set cubes {red 0 green 0 blue 0}
+        lassign [split $l :] label draws
+        lassign $label junk game
+        set draws [split $draws \;]
+        foreach draw $draws {
+            foreach item [split $draw ,] {
+                lassign $item num col
+                if {$num > [dict get $cubes $col]} {
+                    dict set cubes $col $num
                 }
             }
-            set p [* {*}[dict values $cubes]]
-            incr sum $p
         }
-        puts $sum
+        set p [* {*}[dict values $cubes]]
+        incr sum $p
     }
+    puts $sum
+}
 
-    run
+run
