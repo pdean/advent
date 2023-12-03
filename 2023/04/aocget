@@ -1,2 +1,6 @@
 #!/bin/sh
+rm -f puzzle.md
+rm -f input
 aoc d  -y 2023 -d 4 
+cat puzzle.md
+echo ""
