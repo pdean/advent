@@ -2,14 +2,51 @@
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
-package require fileutil
-package require textutil
-namespace import ::textutil::split*
 
 proc run {} {
+    set data [string map {{.} { }} [read -nonewline stdin]]
+    set odata [lmap l [split $data \n] {split $l {}}]
+    set m [llength $odata]
+    set n [llength [lindex $odata 0]]
+    set ndata $odata
 
-    set data [read -nonewline stdin]
+    set i 0
+    foreach l $odata {
+        set indices [regexp -all -indices -inline {[^ \d]} [join $l {}]] 
+        if {[llength $indices]} { 
+            foreach pair $indices {
+                set j [lindex $pair 0]
+                foreach {dr dc} {-1 -1 -1 0 -1 1 
+                                  0 -1       0 1
+                                  1 -1  1 0  1 1} {
+                    set r [+ $i $dr]
+                    set c [+ $j $dc]
+                    if {$r < 0 || $r == $m || $c < 0 || $c == $n} continue
+                    set ch [lindex $odata $r $c]
+                    if {$ch ne " "} {
+                        lset ndata $r $c X
+                    }
+                }
+            }
+        }
+        incr i
+    }
 
+    foreach l $odata {
+        set words [regexp -all -inline {\d+} [join $l {}]]
+        foreach w $words {
+            incr sum $w
+        }
+    }
+ 
+    foreach l $ndata {
+        set words [regexp -all -inline {\S+} [join $l {}]]
+        foreach w $words {
+            if {[string is integer -strict $w]} {
+                incr sum -$w
+            }
+        }
+    }
+    puts $sum
 }
-
 run
