@@ -1,0 +1,34 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+
+set data [read -nonewline stdin]
+set lines [split $data \n]
+
+foreach line $lines {
+    lassign [split $line :] label rest
+    set ticket [lindex $label 1]
+    lassign [split $rest |] win have
+    dict set scores $ticket 0
+    foreach card $have {
+        if {$card in $win} {
+            dict incr scores $ticket
+        }
+    }
+}
+
+for {set i 1} {$i <= $ticket} {incr i} {
+    dict incr cards $i
+    set score [dict get $scores $i]
+    if {$score} {
+        set n [dict get $cards $i]
+        for {set j 1} {$j <= $score} {incr j} {
+            dict incr cards [+ $i $j] $n
+        }
+    }
+}
+
+set sum [+ {*}[dict values $cards]]
+puts $sum
+
