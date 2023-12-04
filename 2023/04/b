@@ -1,10 +1,10 @@
 #!/usr/bin/env tclsh
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
 
+package require struct::queue
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
 
 proc run {} {
-
     set data [read -nonewline stdin]
     set lines [split $data \n]
 
@@ -12,20 +12,30 @@ proc run {} {
         lassign [split $line :] label cards
         set ticket [lindex $label 1]
         lassign [split $cards |] win have
-
         set score 0
         foreach card $have {
             if {$card in $win} {
-                if {$score} {
-                    set score [* $score 2]
-                } else {
-                    set score 1
-                }
+                incr score
             }
         }
-        incr sum $score
+        dict set scores $ticket $score
     }
+
+    ::struct::queue Q
+    for {set i 1} {$i <= $ticket} {incr i} { Q put $i }
+
+    while {[Q size]} {
+        set t [Q get]
+        incr sum
+        set score [dict get $scores $t]
+        if {$score} {
+            for {set i 1} {$i <= $score} {incr i} {
+                Q put [+ $t $i]
+            }
+        }
+    }
+
     puts $sum
 }
-
 run
+

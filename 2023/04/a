@@ -3,29 +3,24 @@
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
 
-proc run {} {
+set data [read -nonewline stdin]
+set lines [split $data \n]
 
-    set data [read -nonewline stdin]
-    set lines [split $data \n]
+foreach line $lines {
+    lassign [split $line :] label cards
+    set ticket [lindex $label 1]
+    lassign [split $cards |] win have
 
-    foreach line $lines {
-        lassign [split $line :] label cards
-        set ticket [lindex $label 1]
-        lassign [split $cards |] win have
-
-        set score 0
-        foreach card $have {
-            if {$card in $win} {
-                if {$score} {
-                    set score [* $score 2]
-                } else {
-                    set score 1
-                }
+    set score 0
+    foreach card $have {
+        if {$card in $win} {
+            if {$score} {
+                set score [* $score 2]
+            } else {
+                set score 1
             }
         }
-        incr sum $score
     }
-    puts $sum
+    incr sum $score
 }
-
-run
+puts $sum
