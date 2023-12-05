@@ -12,26 +12,41 @@ proc run {} {
     lassign [split $first :] junk seeds
     set tables [lmap l $rest { lrange [split $l \n] 1 end }]
 
-    set res 0
-    foreach {st num} $seeds {
-        for {set seed $st} {$seed < [+ $st $num]} {incr seed} {
-            set src $seed
-            foreach table $tables {
-                foreach row $table {
-                    lassign $row d s i
-                    if {[<= $s $src [+ $s $i]]} {
-                        set src [+ $d [- $src $s]]
-                        break
+    foreach {st sz} $seeds {
+        set r [list $st [+ $st $sz]]
+        set qr [list $r]
+
+        foreach table $tables {
+            set qa [list]
+
+            foreach row $table {
+                set qn [list]
+                lassign $row td ts tl
+                set te [+ $ts $tl]
+
+                while {[llength $qr]} {
+                    set qr [lassign $qr r]
+                    lassign $r ss se
+
+                    set pre  [list $ss [min $ts $se]] 
+                    set win  [list [max $ss $ts] [min $te $se]]
+                    set pos  [list [max $te $ss] $se]
+
+                    if {[< {*}$pre]} { lappend qn $pre }
+                    if {[< {*}$win]} { 
+                        lassign $win s e
+                        set s [+ $td [- $s $ts]]
+                        set e [+ $td [- $e $ts]]
+                        lappend qa [list $s $e]
                     }
+                    if {[< {*}$pos]} { lappend qn $pos }
                 }
+                set qr $qn
             }
-            if {!$res} {
-                set res $src
-            } else {
-                set res [min $res $src]
-            }
+            set qr [concat $qa $qr]
         }
+        lappend mins [min {*}[lmap r $qr {lindex $r 0}]]
     }
-    puts $res
+    puts [min {*}$mins]
 }
 run
