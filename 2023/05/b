@@ -5,23 +5,33 @@ namespace path [list ::tcl::mathop ::tcl::mathfunc]
 package require textutil
 namespace import ::textutil::split*
 
-set data [read -nonewline stdin]
-set pieces [splitx $data \n\s*\n]
-set rest [lassign $pieces first]
-lassign [split $first :] junk seeds
-set tables [lmap l $rest { lrange [split $l \n] 1 end }]
+proc run {} {
+    set data [read -nonewline stdin]
+    set pieces [splitx $data \n\s*\n]
+    set rest [lassign $pieces first]
+    lassign [split $first :] junk seeds
+    set tables [lmap l $rest { lrange [split $l \n] 1 end }]
 
-set res [list]
-foreach src $seeds {
-    foreach table $tables {
-        foreach row $table {
-            lassign $row d s i
-            if {[<= $s $src [+ $s $i]]} {
-                set src [+ $d [- $src $s]]
-                break
+    set res 0
+    foreach {st num} $seeds {
+        for {set seed $st} {$seed < [+ $st $num]} {incr seed} {
+            set src $seed
+            foreach table $tables {
+                foreach row $table {
+                    lassign $row d s i
+                    if {[<= $s $src [+ $s $i]]} {
+                        set src [+ $d [- $src $s]]
+                        break
+                    }
+                }
+            }
+            if {!$res} {
+                set res $src
+            } else {
+                set res [min $res $src]
             }
         }
     }
-    lappend res $src
+    puts $res
 }
-puts [lindex [lsort -integer $res] 0]
+run

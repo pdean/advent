@@ -11,7 +11,7 @@ set rest [lassign $pieces first]
 lassign [split $first :] junk seeds
 set tables [lmap l $rest { lrange [split $l \n] 1 end }]
 
-set res [list]
+set res 0
 foreach src $seeds {
     foreach table $tables {
         foreach row $table {
@@ -22,6 +22,10 @@ foreach src $seeds {
             }
         }
     }
-    lappend res $src
+    if {!$res} {
+        set res $src
+    } else {
+        set res [min $res $src]
+    }
 }
-puts [lindex [lsort -integer $res] 0]
+puts $res
