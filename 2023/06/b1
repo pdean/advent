@@ -8,10 +8,6 @@
     set T [string map {{ } {}} $times]
     set R [string map {{ } {}} $dists]
     set F [expr {sqrt($T*$T-4*$R)}]
-    set p1 [expr {int(($T-$F)/2.0)}]
-    set d1 [expr {$p1*$T-$p1*$p1}]
-    if {$d1 <= $R} {incr p1}
-    set p2 [expr {int(($T+$F)/2.0)}]
-    set d2 [expr {$p2*$T-$p2*$p2}]
-    if {$d2 <= $R} {incr p2 -1}
-    puts [expr {$p2-$p1+1}]
+    set p1 [expr {($T-$F)/2.0}]
+    set p2 [expr {($T+$F)/2.0}]
+    puts [expr {ceil($p2)-floor($p1)-1}]
