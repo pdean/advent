@@ -1,0 +1,22 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+
+proc run {} {
+
+    set data [read -nonewline stdin]
+    lassign [split $data \n] l1 l2
+    lassign [split $l1 :] junk times
+    lassign [split $l2 :] junk dists
+
+    foreach T $times R $dists {
+        set F [sqrt [- [* $T $T] [* 4 $R]]]
+        set p1 [/ [- $T $F] 2.0]
+        set p2 [/ [+ $T $F] 2.0]
+        set d [int [- [ceil $p2] [floor $p1] 1]]
+        lappend res $d
+    }
+    puts [* {*}$res]
+}
+run
