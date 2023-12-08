@@ -6,10 +6,10 @@ package require fileutil
 package require textutil
 namespace import ::textutil::split*
 
-set data [read -nonewline stdin]
+set input [read -nonewline stdin]
 
 proc run {} {
-    global data res
+    global input res
 
 
 }
