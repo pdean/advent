@@ -16,7 +16,7 @@ proc run {} {
         dict set nodes $n [list $l $r] 
         if {[regexp A$ $n]} {lappend curs $n}
     }
-    set ncurs [llength $curs]
+
     set lsteps [list]
     foreach cur $curs {
         set Q  [list]
