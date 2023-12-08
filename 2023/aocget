@@ -2,4 +2,4 @@
 rm -f puzzle.md
 rm -f input
 aoc d  -y 2023 -d x 
-glow puzzle.md
+glow -p puzzle.md

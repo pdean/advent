@@ -2,5 +2,4 @@
 rm -f puzzle.md
 rm -f input
 aoc d  -y 2023 -d 8 
-cat puzzle.md
-echo ""
+glow -p puzzle.md
