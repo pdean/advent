@@ -2,14 +2,33 @@
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
-package require fileutil
 package require textutil
 namespace import ::textutil::split*
 
 proc run {} {
 
     set data [read -nonewline stdin]
+    lassign [splitx $data \n\n] dir rest
+    set dir [split $dir {}]
+    set inp [regexp -all -inline {\w+} $rest] 
 
+    foreach {n l r} $inp {
+        dict set nodes $n [list $l $r] 
+    }
+
+    set cur AAA
+    set Q  [list]
+    set steps 0
+
+    while true {
+        incr steps
+        lassign [dict get $nodes $cur] l r
+        if {![llength $Q]} {set Q $dir}
+        set Q [lassign $Q next]
+        if {$next eq "L"} {set cur $l} else {set cur $r}
+        if {$cur eq "ZZZ"} break
+    }
+    puts $steps
 }
 
 run
