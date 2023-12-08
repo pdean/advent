@@ -1,5 +1,5 @@
 #!/bin/sh
 rm -f puzzle.md
 rm -f input
-aoc d  -y 2023 -d x 
+aoc d  -y 2023 -d 9 
 glow puzzle.md

@@ -6,8 +6,10 @@ package require textutil
 namespace import ::textutil::split*
 package require math::numtheory
 
+set data [read -nonewline stdin]
+
 proc run {} {
-    set data [read -nonewline stdin]
+    global res data
     lassign [splitx $data \n\n] dir rest
     set dir [split $dir {}]
     set inp [regexp -all -inline {\w+} $rest] 
@@ -31,10 +33,11 @@ proc run {} {
         }
         lappend lsteps $steps
     }
-    set rest [lassign $lsteps cf] 
+    set rest [lassign $lsteps lcm] 
     foreach f $rest {
-        set cf [math::numtheory::lcm $f $cf]
+        set lcm [math::numtheory::lcm $f $lcm]
     }
-    puts $cf
+    set res $lcm
 }
-run
+puts [time run 10]
+puts $res
