@@ -1,0 +1,40 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require textutil
+namespace import ::textutil::split*
+package require math::numtheory
+
+proc run {} {
+    set data [read -nonewline stdin]
+    lassign [splitx $data \n\n] dir rest
+    set dir [split $dir {}]
+    set inp [regexp -all -inline {\w+} $rest] 
+
+    foreach {n l r} $inp {
+        dict set nodes $n [list $l $r] 
+        if {[regexp A$ $n]} {lappend curs $n}
+    }
+    set ncurs [llength $curs]
+    set lsteps [list]
+    foreach cur $curs {
+        set Q  [list]
+        set steps 0
+        while true {
+            incr steps
+            if {![llength $Q]} {set Q $dir}
+            set Q [lassign $Q next]
+            lassign [dict get $nodes $cur] l r
+            if {$next eq "L"} {set cur $l} else {set cur $r}
+            if {[regexp Z$ $cur]} break
+        }
+        lappend lsteps $steps
+    }
+    set rest [lassign $lsteps cf] 
+    foreach f $rest {
+        set cf [math::numtheory::lcm $f $cf]
+    }
+    puts $cf
+}
+run
