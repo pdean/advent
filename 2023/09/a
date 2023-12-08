@@ -14,5 +14,5 @@ proc run {} {
 
 }
 
-run
+puts [time run]
 puts $res

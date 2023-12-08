@@ -39,5 +39,5 @@ proc run {} {
     }
     set res $lcm
 }
-puts [time run 10]
+puts [time run]
 puts $res
