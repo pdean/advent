@@ -1,0 +1,42 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+set input [read -nonewline stdin]
+proc run {} {
+    global input res
+    set res 0
+    set lines [split $input \n]
+    foreach line $lines {
+        set l $line
+        set m [list $l]
+        set first [list]
+        while true {
+            lappend first [lindex $l 0]
+            set n [list]
+            set l [lassign $l o]
+            foreach p $l {
+                lappend n [- $p $o]
+                set o $p
+            }
+            lappend m $n
+            set end 1
+            foreach q $n {
+                if {$q} {
+                    set end 0
+                    break
+                }
+            }
+            if {$end} break
+            set l $n
+        }
+        set first [lreverse $first]
+        set sum 0
+        foreach q $first {
+            set sum [- $q $sum]
+        }
+        incr res $sum
+    }
+}
+puts [time run]
+puts $res
