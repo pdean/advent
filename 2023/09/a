@@ -10,8 +10,38 @@ set input [read -nonewline stdin]
 
 proc run {} {
     global input res
+    set res 0
 
+    set lines [split $input \n]
 
+    foreach line $lines {
+        set l $line
+        set m [list $l]
+        set last [list]
+        while true {
+            lappend last [lindex $l end]
+            set n [list]
+            set l [lassign $l o]
+            foreach p $l {
+                lappend n [- $p $o]
+                set o $p
+            }
+            lappend m $n
+            set end 1
+            foreach q $n {
+                if {$q} {
+                    set end 0
+                    break
+                
+                }
+            }
+            if {$end} break
+            set l $n
+        }
+        set sum [+ {*}$last]
+        incr res $sum
+
+    }
 }
 
 puts [time run]
