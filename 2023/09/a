@@ -2,18 +2,11 @@
 # vim:sts=4:sw=4:tw=80:et:ft=tcl 
 
 namespace path [list ::tcl::mathop ::tcl::mathfunc]
-package require fileutil
-package require textutil
-namespace import ::textutil::split*
-
 set input [read -nonewline stdin]
-
 proc run {} {
     global input res
     set res 0
-
     set lines [split $input \n]
-
     foreach line $lines {
         set l $line
         set m [list $l]
@@ -32,7 +25,6 @@ proc run {} {
                 if {$q} {
                     set end 0
                     break
-                
                 }
             }
             if {$end} break
@@ -40,9 +32,7 @@ proc run {} {
         }
         set sum [+ {*}$last]
         incr res $sum
-
     }
 }
-
 puts [time run]
 puts $res
