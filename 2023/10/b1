@@ -47,6 +47,51 @@ proc run {} {
             }
         }
     }
+
+    puts $res
+
+    set ngrid [lrepeat $m [lrepeat $n .]]
+    foreach k [dict keys $done] {
+        lassign $k x y
+        lset ngrid $y $x [lindex $grid $y $x]
+    }
+
+    foreach l $ngrid {
+        puts [join $l {}]
+    }
+
+    set res 0
+    for {set y 0} {$y < $m} {incr y} {
+        set in false
+        for {set x 1} {$x < $n} {incr x}  {
+            set b [lindex $ngrid $y $x]
+            set p [lindex $ngrid $y [- $x 1]]
+            if {$b eq "."} {
+                if {$in} {
+                    incr res
+                    lset ngrid $y $x I
+                }
+                continue
+            } 
+            set bends [dict get $bend $b]
+            if {W in $bends} {
+                set l [dict get $conn "$b -1 0" ]
+                if {$p in $l} {
+                    if {"$p$b" eq "L7" || "$p$b" eq "FJ"} {
+                        set in [! $in]
+                    } else {
+                        set in true
+                    }
+                }
+            }
+        }
+    }
+
+    foreach l $ngrid {
+        puts [join $l {}]
+    }
+
+
 }
 
 puts [time run]
