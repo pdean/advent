@@ -1,0 +1,125 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+
+set input [read -nonewline stdin]
+
+set dirs {N {0 -1} E {1 0} S {0 1} W {-1 0}}
+set nbs { N {| 7 F} S {| L J} W {- F L} E {- J 7}}
+set bend {| {N S} - {E W} L {E N} J {N W} 7 {S W} F {E S} S {E N S W}}
+
+proc run {} {
+    global input res1 res2 dirs nbs bend
+    set res1 0
+    set res2 0
+
+    set grid [lmap l [split $input \n] {split $l {}}]
+    set m [llength $grid]
+    set n [llength [lindex $grid 0]]
+
+    set conc [concat {*}$grid]
+    set s [lsearch $conc S]
+    set sx [% $s $n]
+    set sy [/ $s $m]
+    set sn [list]
+    dict incr done "$sx $sy"
+    set todo [list $sx $sy 0]
+
+    while {[llength $todo]} {
+        set todo [lassign $todo x y d]
+        set res1 [max $res1 $d]
+        set p [lindex $grid $y $x]
+        set bends [dict get $bend $p]
+        incr d
+        foreach dir {N S E W} {
+            if {!($dir in $bends)} continue
+            lassign [dict get $dirs $dir] dx dy
+            set nx [+ $x $dx]
+            set ny [+ $y $dy]
+            if {$nx < 0 || $nx == $n || $ny < 0 || $ny == $m} continue
+            if {[dict exists $done "$nx $ny"]} continue
+            set q [lindex $grid $ny $nx]
+            set l [dict get $nbs $dir]
+            if {$q in $l} {
+                lappend todo $nx $ny $d
+                dict incr done "$nx $ny"
+                if {$p eq "S"} {lappend sn $dir}
+            }
+        }
+    }
+
+    # new grid with circuit only
+    set ngrid [lrepeat $m [lrepeat $n .]]
+    foreach k [dict keys $done] {
+        lassign $k x y
+        lset ngrid $y $x [lindex $grid $y $x]
+    }
+
+    #  replace S with correct bend
+    set sn [lsort $sn]
+    dict for {key val} $bend {
+        if {$sn eq $val} {
+            set rep $key
+            break
+        }
+    }
+    lset ngrid $sy $sx $key
+
+    for {set y 0} {$y < $m} {incr y} {
+        set cnr false
+        set prev 0
+        set in false
+        for {set x 0} {$x < $n} {incr x}  {
+            set b [lindex $ngrid $y $x]
+            if {$b eq "."} {
+                if {$in} {
+                    incr res2
+                    lset ngrid $y $x I
+                }
+                continue
+            } 
+            if {$b eq "|"} {
+                set in [! $in]
+                continue
+            }
+            if {$b eq "-"} continue
+            if {$b eq "F"} {
+                set cnr true
+                set prev F
+                continue
+            }
+            if {$b eq "L"} {
+                set cnr true
+                set prev "L"
+                continue
+            }
+            if {$b eq "J"} {
+                if {!$cnr} {
+                    puts "J shouldn't happen"
+                    exit
+                }
+                if {$prev eq "F"} {
+                    set in [! $in]
+                }
+                set cnr false
+                continue
+            }
+            if {$b eq "7"} {
+                if {!$cnr} {
+                    puts "7 shouldn't happen"
+                    exit
+                }
+                if {$prev eq "L"} {
+                    set in [! $in]
+                }
+                set cnr false
+                continue
+            }
+        }
+    }
+}
+
+puts [time run]
+puts $res1
+puts $res2
