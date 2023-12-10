@@ -25,22 +25,10 @@ proc run {} {
 
     set conc [concat {*}[lmap l [split $input \n] {split $l {}}]]
     set s [lsearch $conc S]
-    set x [% $s $m]
-    set y [/ $s $n]
+    set x [% $s $n]
+    set y [/ $s $m]
+    set todo [list $x $y 0]
     dict incr done "$x $y"
-    set todo [list]
-
-    foreach {dx dy} {-1  0   1  0  0 -1 0  1 } {
-        set nx [+ $x $dx]
-        set ny [+ $y $dy]
-        if {$nx < 0 || $nx == $n || $ny < 0 || $ny == $m} continue
-        set p [lindex $grid $ny $nx]
-        set l [dict get $conn "S $dx $dy"]
-        if {$p in $l} {
-            lappend todo $nx $ny 1
-            dict incr done "$nx $ny"
-        }
-    }
 
     while {[llength $todo]} {
         set todo [lassign $todo x y d]
@@ -62,6 +50,54 @@ proc run {} {
             }
         }
     }
+
+    set ngrid [lrepeat $m [lrepeat $n .]]
+    foreach k [dict keys $done] {
+        lassign $k x y
+        lset ngrid $y $x [lindex $grid $y $x]
+    }
+
+    foreach l $grid {
+        puts [join $l {}]
+    }
+
+    foreach l $ngrid {
+        puts [join $l {}]
+    }
+
+    set res 0
+    for {set y 0} {$y < $m} {incr y} {
+        set in false
+        for {set x 1} {$x < $n} {incr x}  {
+            set b [lindex $ngrid $y $x]
+            if {$b eq "."} {
+                if {$in} {
+                    incr res
+                    lset ngrid $y $x I
+                }
+            } else {
+                set p [lindex $ngrid $y [- $x 1]]
+                if {$p eq "."} {
+                    set in [! $in]
+                    continue
+                }
+                if {[dict exists $conn "$b -1 0"]} {
+                    set l [dict get $conn "$b -1 0" ]
+                    if {$p in $l} {
+                        if {"$p$b" eq "L7" || "$p$b" eq "FJ"} {
+                            set in [! $in]
+                        }
+                    } else {
+                        set in [! $in]
+                    }
+                }
+            }
+        }
+    }
+    foreach l $ngrid {
+        puts [join $l {}]
+    }
+
 }
 
 puts [time run]
