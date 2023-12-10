@@ -7,9 +7,9 @@ set input [read -nonewline stdin]
 
 set dirs {N {0 -1} E {1 0} S {0 1} W {-1 0}}
 set nbs { N {| 7 F} S {| L J} W {- F L} E {- J 7}}
-set bend {| {N S} - {W E} L {E N}
-          J {W N} 7 {W S} F {E S}
-          S {W E N S}}
+set bend {| {N S} - {E W} L {E N}
+          J {N W} 7 {S W} F {E S}
+          S {E N S W}}
 
 proc run {} {
     global input res dirs nbs bend
@@ -21,10 +21,11 @@ proc run {} {
 
     set conc [concat {*}$grid]
     set s [lsearch $conc S]
-    set x [% $s $n]
-    set y [/ $s $m]
-    dict incr done "$x $y"
-    set todo [list $x $y 0]
+    set sx [% $s $n]
+    set sy [/ $s $m]
+    set sn [list]
+    dict incr done "$sx $sy"
+    set todo [list $sx $sy 0]
 
     while {[llength $todo]} {
         set todo [lassign $todo x y d]
@@ -44,6 +45,7 @@ proc run {} {
             if {$q in $l} {
                 lappend todo $nx $ny $d
                 dict incr done "$nx $ny"
+                if {$p eq "S"} {lappend sn $dir}
             }
         }
     }
@@ -56,9 +58,20 @@ proc run {} {
         lset ngrid $y $x [lindex $grid $y $x]
     }
 
+    set sn [lsort $sn]
+    dict for {key val} $bend {
+        if {$sn eq $val} {
+            set rep $key
+            break
+        }
+    }
+    puts $key
+    lset ngrid $sy $sx $key
+
     foreach l $ngrid {
         puts [join $l {}]
     }
+    puts ""
 
     set res 0
     for {set y 0} {$y < $m} {incr y} {
@@ -100,7 +113,6 @@ proc run {} {
                 set cnr false
                 continue
             }
-
             if {$b eq "7"} {
                 if {!$cnr} {
                     puts "7 shouldn't happen"
