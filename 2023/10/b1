@@ -62,10 +62,11 @@ proc run {} {
 
     set res 0
     for {set y 0} {$y < $m} {incr y} {
+        set cnr false
+        set prev 0
         set in false
         for {set x 0} {$x < $n} {incr x}  {
             set b [lindex $ngrid $y $x]
-            set p [lindex $ngrid $y [- $x 1]]
             if {$b eq "."} {
                 if {$in} {
                     incr res
@@ -73,16 +74,43 @@ proc run {} {
                 }
                 continue
             } 
-            set bends [dict get $bend $b]
-            if {E in $bends} {
-                set l [dict get $nbs W]
-                if {$p in $l} {
-                    if {"$p$b" eq "L7" || "$p$b" eq "FJ"} {
-                        set in [! $in]
-                    } else {
-                        set in true
-                    }
+            if {$b eq "|"} {
+                set in [! $in]
+                continue
+            }
+            if {$b eq "-"} continue
+            if {$b eq "F"} {
+                set cnr true
+                set prev F
+                continue
+            }
+            if {$b eq "L"} {
+                set cnr true
+                set prev "L"
+                continue
+            }
+            if {$b eq "J"} {
+                if {!$cnr} {
+                    puts "J shouldn't happen"
+                    exit
                 }
+                if {$prev eq "F"} {
+                    set in [! $in]
+                }
+                set cnr false
+                continue
+            }
+
+            if {$b eq "7"} {
+                if {!$cnr} {
+                    puts "7 shouldn't happen"
+                    exit
+                }
+                if {$prev eq "L"} {
+                    set in [! $in]
+                }
+                set cnr false
+                continue
             }
         }
     }
