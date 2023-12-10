@@ -5,18 +5,14 @@ namespace path [list ::tcl::mathop ::tcl::mathfunc]
 
 set input [read -nonewline stdin]
 
-set conn { {| 0 -1} {| 7 F} {| 0 1} {| L J}
-           {- -1 0} {- F L} {- 1 0} {- J 7}
-           {L 1 0} {- J 7}  {L 0 -1} {| 7 F}
-           {J -1 0} {- F L} {J 0 -1} {| 7 F}
-           {7 -1 0} {- F L} {7 0 1} {| L J}
-           {F 1 0} {- 7 J} {F 0 1} {| L J}
-           {S -1 0} { - F L} {S 1 0} {- J 7}
-           {S 0 -1} {| 7 F} {S 0 1} {| L J} 
-       }
-    
+set dirs {N {0 -1} E {1 0} S {0 1} W {-1 0}}
+set nbs { N {| 7 F} S {| L J} W {- F L} E {- J 7}}
+set bend {| {N S} - {W E} L {E N}
+          J {W N} 7 {W S} F {E S}
+          S {W E N S}}
+
 proc run {} {
-    global input res conn
+    global input res dirs nbs bend
     set res 0
 
     set grid [lmap l [split $input \n] {split $l {}}]
@@ -34,19 +30,20 @@ proc run {} {
         set todo [lassign $todo x y d]
         set res [max $res $d]
         set p [lindex $grid $y $x]
+        set bends [dict get $bend $p]
         incr d
-        foreach {dx dy} {-1  0   1  0  0 -1 0  1 } {
+        foreach dir {N S E W} {
+            if {!($dir in $bends)} continue
+            lassign [dict get $dirs $dir] dx dy
             set nx [+ $x $dx]
             set ny [+ $y $dy]
             if {$nx < 0 || $nx == $n || $ny < 0 || $ny == $m} continue
             if {[dict exists $done "$nx $ny"]} continue
             set q [lindex $grid $ny $nx]
-            if {[dict exists $conn "$p $dx $dy"]} {
-                set l [dict get $conn "$p $dx $dy"]
-                if {$q in $l} {
-                    lappend todo $nx $ny $d
-                    dict incr done "$nx $ny"
-                }
+            set l [dict get $nbs $dir]
+            if {$q in $l} {
+                lappend todo $nx $ny $d
+                dict incr done "$nx $ny"
             }
         }
     }

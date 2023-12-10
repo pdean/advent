@@ -23,7 +23,7 @@ proc run {} {
     set m [llength $grid]
     set n [llength [lindex $grid 0]]
 
-    set conc [concat {*}[lmap l [split $input \n] {split $l {}}]]
+    set conc [concat {*}$grid]
     set s [lsearch $conc S]
     set x [% $s $n]
     set y [/ $s $m]
