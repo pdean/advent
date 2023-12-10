@@ -1,0 +1,56 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+
+set input [read -nonewline stdin]
+
+set conn { {| 0 -1} {| 7 F} {| 0 1} {| L J}
+           {- -1 0} {- F L} {- 1 0} {- J 7}
+           {L 1 0} {- J 7}  {L 0 -1} {| 7 F}
+           {J -1 0} {- F L} {J 0 -1} {| 7 F}
+           {7 -1 0} {- F L} {7 0 1} {| L J}
+           {F 1 0} {- 7 J} {F 0 1} {| L J}
+           {S -1 0} { - F L} {S 1 0} {- J 7}
+           {S 0 -1} {| 7 f} {S 0 1} {| L J} 
+       }
+    
+proc run {} {
+    global input res conn
+    set res 0
+
+    set grid [lmap l [split $input \n] {split $l {}}]
+    set m [llength $grid]
+    set n [llength [lindex $grid 0]]
+
+    set conc [concat {*}[lmap l [split $input \n] {split $l {}}]]
+    set s [lsearch $conc S]
+    set x [% $s $m]
+    set y [/ $s $n]
+    dict incr done "$x $y"
+    set todo [list $x $y 0]
+
+    while {[llength $todo]} {
+        set todo [lassign $todo x y d]
+        set res [max $res $d]
+        set p [lindex $grid $y $x]
+        incr d
+        foreach {dx dy} {-1  0   1  0  0 -1 0  1 } {
+            set nx [+ $x $dx]
+            set ny [+ $y $dy]
+            if {$nx < 0 || $nx == $n || $ny < 0 || $ny == $m} continue
+            if {[dict exists $done "$nx $ny"]} continue
+            set q [lindex $grid $ny $nx]
+            if {[dict exists $conn "$p $dx $dy"]} {
+                set l [dict get $conn "$p $dx $dy"]
+                if {$q in $l} {
+                    lappend todo $nx $ny $d
+                    dict incr done "$nx $ny"
+                }
+            }
+        }
+    }
+}
+
+puts [time run]
+puts $res
