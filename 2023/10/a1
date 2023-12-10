@@ -12,7 +12,7 @@ set conn { {| 0 -1} {| 7 F} {| 0 1} {| L J}
            {7 -1 0} {- F L} {7 0 1} {| L J}
            {F 1 0} {- 7 J} {F 0 1} {| L J}
            {S -1 0} { - F L} {S 1 0} {- J 7}
-           {S 0 -1} {| 7 f} {S 0 1} {| L J} 
+           {S 0 -1} {| 7 F} {S 0 1} {| L J} 
        }
     
 proc run {} {
@@ -25,8 +25,8 @@ proc run {} {
 
     set conc [concat {*}[lmap l [split $input \n] {split $l {}}]]
     set s [lsearch $conc S]
-    set x [% $s $m]
-    set y [/ $s $n]
+    set x [% $s $n]
+    set y [/ $s $m]
     dict incr done "$x $y"
     set todo [list $x $y 0]
 

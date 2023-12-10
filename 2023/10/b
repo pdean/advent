@@ -5,14 +5,14 @@ namespace path [list ::tcl::mathop ::tcl::mathfunc]
 
 set input [read -nonewline stdin]
 
-set conn { {| 0 -1} {| 7 F} {| 0 1} {| L J}
-           {- -1 0} {- F L} {- 1 0} {- J 7}
-           {L 1 0} {- J 7}  {L 0 -1} {| 7 F}
-           {J -1 0} {- F L} {J 0 -1} {| 7 F}
-           {7 -1 0} {- F L} {7 0 1} {| L J}
-           {F 1 0} {- 7 J} {F 0 1} {| L J}
-           {S -1 0} { - F L} {S 1 0} {- J 7}
-           {S 0 -1} {| 7 f} {S 0 1} {| L J} 
+set conn { {| 0 -1} {| 7 F}   {| 0 1} {| L J}  
+           {- -1 0} {- F L}   {- 1 0} {- J 7}
+           {L 1 0} {- J 7}   {L 0 -1} {| 7 F} 
+           {J -1 0} {- F L}   {J 0 -1} {| 7 F}
+           {7 -1 0} {- F L}   {7 0 1} {| L J}
+           {F 1 0} {- 7 J}   {F 0 1} {| L J}
+           {S -1 0} {- F L}   {S 1 0} {- J 7}
+           {S 0 -1} {| 7 F}   {S 0 1} {| L J} 
        }
     
 proc run {} {
@@ -27,8 +27,8 @@ proc run {} {
     set s [lsearch $conc S]
     set x [% $s $n]
     set y [/ $s $m]
-    set todo [list $x $y 0]
     dict incr done "$x $y"
+    set todo [list $x $y 0]
 
     while {[llength $todo]} {
         set todo [lassign $todo x y d]
@@ -51,14 +51,12 @@ proc run {} {
         }
     }
 
+    puts $res
+
     set ngrid [lrepeat $m [lrepeat $n .]]
     foreach k [dict keys $done] {
         lassign $k x y
         lset ngrid $y $x [lindex $grid $y $x]
-    }
-
-    foreach l $grid {
-        puts [join $l {}]
     }
 
     foreach l $ngrid {
@@ -70,30 +68,28 @@ proc run {} {
         set in false
         for {set x 1} {$x < $n} {incr x}  {
             set b [lindex $ngrid $y $x]
+            set p [lindex $ngrid $y [- $x 1]]
             if {$b eq "."} {
                 if {$in} {
                     incr res
                     lset ngrid $y $x I
                 }
-            } else {
-                set p [lindex $ngrid $y [- $x 1]]
-                if {$p eq "."} {
-                    set in [! $in]
-                    continue
-                }
-                if {[dict exists $conn "$b -1 0"]} {
-                    set l [dict get $conn "$b -1 0" ]
-                    if {$p in $l} {
-                        if {"$p$b" eq "L7" || "$p$b" eq "FJ"} {
-                            set in [! $in]
-                        }
-                    } else {
+                continue
+            } 
+            if {$p eq "."} continue
+            if {[dict exists $conn "$b -1 0"]} {
+                set l [dict get $conn "$b -1 0" ]
+                if {$p in $l} {
+                    if {"$p$b" eq "L7" || "$p$b" eq "FJ"} {
                         set in [! $in]
+                    } else {
+                        set in true
                     }
                 }
             }
         }
     }
+
     foreach l $ngrid {
         puts [join $l {}]
     }
