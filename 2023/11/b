@@ -31,26 +31,30 @@ proc run {} {
     set xseq [lsort -integer [dict keys $xval]]
     set yseq [lsort -integer [dict keys $yval]]
 
+    set X 1000000
+
     set xl [lassign $xseq x0]
     set c 0
     set xc [list $x0 $c]
     foreach x1 $xl {
         set d [- $x1 $x0 1]
-        incr c $d
+        if {$d} {
+            incr c [- [* $d $X] $d]
+        }
         lappend xc $x1 $c
         set x0 $x1
     }
-
     set yl [lassign $yseq y0]
     set c 0
     set yc [list $y0 $c]
     foreach y1 $yl {
         set d [- $y1 $y0 1]
-        incr c $d
+        if {$d} {
+            incr c [- [* $d $X] $d]
+        }
         lappend yc $y1 $c
         set y0 $y1
     }
-
     dict for {key val} $gal {
         lassign $val x y
         set nx [+ $x [dict get $xc $x]]
