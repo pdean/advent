@@ -1,0 +1,71 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+
+set input [read -nonewline stdin]
+
+proc run {} {
+    global input res
+    set res 0
+
+    set grid [lmap l [split $input \n] {split $l {}}]
+    set m [llength $grid]
+    set n [llength [lindex $grid 0]]
+
+    for {set y 0} {$y < $m} {incr y} {
+        for {set x 0} {$x < $n} {incr x} {
+            set g [lindex $grid $y $x]
+            if {$g eq "#"} {
+                incr p
+                dict set gal $p [list $x $y]
+            }
+        }
+    }
+
+    foreach v [dict values $gal] {
+        lassign $v x y
+        dict incr xval $x
+        dict incr yval $y
+    }
+    set xseq [lsort -integer [dict keys $xval]]
+    set yseq [lsort -integer [dict keys $yval]]
+
+    set xl [lassign $xseq x0]
+    set c 0
+    set xc [list $x0 $c]
+    foreach x1 $xl {
+        set d [- $x1 $x0 1]
+        incr c $d
+        lappend xc $x1 $c
+        set x0 $x1
+    }
+
+    set yl [lassign $yseq y0]
+    set c 0
+    set yc [list $y0 $c]
+    foreach y1 $yl {
+        set d [- $y1 $y0 1]
+        incr c $d
+        lappend yc $y1 $c
+        set y0 $y1
+    }
+
+    dict for {key val} $gal {
+        lassign $val x y
+        set nx [+ $x [dict get $xc $x]]
+        set ny [+ $y [dict get $yc $y]]
+        dict set gal $key [list $nx $ny]
+    }
+
+    for {set i 1} {$i <= $p} {incr i} {
+        lassign [dict get $gal $i] x0 y0
+        for {set j [+ $i 1]} {$j <= $p} {incr j} {
+            lassign [dict get $gal $j] x1 y1
+            incr res [+ [abs [- $x1 $x0]] [abs [- $y1 $y0]]]
+        }
+    }
+}
+
+puts [time run]
+puts $res
