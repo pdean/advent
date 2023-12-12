@@ -1,0 +1,19 @@
+#!/usr/bin/env tclsh
+# vim:sts=4:sw=4:tw=80:et:ft=tcl 
+
+namespace path [list ::tcl::mathop ::tcl::mathfunc]
+package require fileutil
+package require textutil
+namespace import ::textutil::split*
+
+set input [read -nonewline stdin]
+
+proc run {} {
+    global input res
+    set res 0
+
+
+}
+
+puts [time run]
+puts $res
