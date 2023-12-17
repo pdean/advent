@@ -12,7 +12,6 @@ proc run {} {
     set grid [lmap l [split $input \n] {split $l {}}]
     set m [llength $grid]
     set n [llength [lindex $grid 0]]
-    puts "$m $n"
 
     for {set y 0} {$y < $m} {incr y} {
         for {set x 0} {$x < $n} {incr x} {
@@ -23,7 +22,6 @@ proc run {} {
             }
         }
     }
-    puts $p
 
     foreach v [dict values $gal] {
         lassign $v x y
@@ -33,35 +31,34 @@ proc run {} {
     set xseq [lsort -integer [dict keys $xval]]
     set yseq [lsort -integer [dict keys $yval]]
 
+    set X 1000000
+
     set xl [lassign $xseq x0]
     set c 0
     set xc [list $x0 $c]
     foreach x1 $xl {
         set d [- $x1 $x0 1]
-        incr c $d
+        if {$d} {
+            incr c [- [* $d $X] $d]
+        }
         lappend xc $x1 $c
         set x0 $x1
     }
-    puts $xseq
-    puts $xc
-
     set yl [lassign $yseq y0]
     set c 0
     set yc [list $y0 $c]
     foreach y1 $yl {
         set d [- $y1 $y0 1]
-        incr c $d
+        if {$d} {
+            incr c [- [* $d $X] $d]
+        }
         lappend yc $y1 $c
         set y0 $y1
     }
-    puts $yseq
-    puts $yc
-
     dict for {key val} $gal {
         lassign $val x y
         set nx [+ $x [dict get $xc $x]]
         set ny [+ $y [dict get $yc $y]]
-        puts "$key $x $y   $nx $ny"
         dict set gal $key [list $nx $ny]
     }
 
@@ -72,11 +69,6 @@ proc run {} {
             incr res [+ [abs [- $x1 $x0]] [abs [- $y1 $y0]]]
         }
     }
-    puts $res
-
-
-
-
 }
 
 puts [time run]
