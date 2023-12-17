@@ -1,0 +1,2 @@
+#!/bin/sh
+aoc d -o  -y 2020 -d x 
