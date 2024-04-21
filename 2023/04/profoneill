@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+# vim: ft=perl
+
+use strict;
+
+my $pointSum;
+my @counts;
+my $countSum;
+
+while (<>) {
+    chomp;
+    my ($card, $win, $have) = m/^Card\s*(\d+):\s+(.*?)\s+\|\s+(.*)\z/;
+    my $count = ++$counts[$card];
+    $countSum += $count;
+    print "Count of $card is $count\n";
+    my %have = map { $_ => 1 } split /\s+/, $have;
+    my $points = 0;
+    my $numWinners = 0;
+    foreach my $num (split /\s+/, $win) {
+        if ($have{$num}) {
+            ++$numWinners;
+            $counts[$card + $numWinners] += $count;
+            if ($points) {
+                $points *= 2;
+            } else {
+                $points = 1;
+            }
+        }
+    }
+    $pointSum += $points;
+}
+
+print "Point Sum: $pointSum\n";
+print "Count sum: $countSum\n";
+

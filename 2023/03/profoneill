@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+# vim: ft=perl
+
+my @lines = map { chomp; $_ } <>;
+my $lineLen = length($lines[0]);
+my $numLines = @lines;
+my $lineLen2 = $lineLen + 2;
+@lines = ('.' x $lineLen2, map { '.' . $_ . '.' } @lines, '.' x $lineLen2);
+my $sum = 0;
+my %gears;
+
+foreach my $y (1 .. $numLines) {
+    while ($lines[$y] =~ m/(\d+)/g) {
+        # push @blobs, [$1, $-[1], $+[1]];
+        my $value = $1;
+        my $lhs = $-[1];
+        my $rhs = $+[1];
+        print "Found $1 at $lhs to $rhs\n";
+        my $hit = 0;
+        foreach my $y1 ($y-1 .. $y+1) {
+            my $line = $lines[$y1];
+            my $start = $lhs - 1;
+            my $end = $rhs + 1;
+            my $blob = substr($line, $start, $end - $start);
+            ++$hit if $blob =~ m/[^\d.]/;
+            while ($blob =~ m/(\*)/g) {
+                my $gearXPos = $-[1] + $start;
+                my $gearYPos = $y1;
+                push @{$gears{"$gearXPos,$gearYPos"}}, $value;
+            }
+            print "  $blob\n";
+        }
+        print $hit == 1 ? "  Hit!\n" : "  Miss!\n";
+        $sum += $value if $hit;
+    }
+}
+
+print "Parts sum: $sum\n";
+
+my $gearSum = 0;
+while (my ($gearLoc, $gearValues) = each %gears) {
+    next unless @$gearValues == 2;
+    my ($lgear, $rgear) = @$gearValues;
+    my $gearValue = $lgear * $rgear;
+    print "$gearLoc: $lgear * $rgear => $gearValue\n";
+    $gearSum += $gearValue;
+}
+
+print "Gear sum: $gearSum\n";
+
