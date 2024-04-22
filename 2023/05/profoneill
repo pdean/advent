@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+# vim: ft=perl
+
+use strict;
+use List::Util qw(min max pairs);
+
+$/ = '';
+
+my @chunks = <>;
+chomp @chunks;
+
+my $seeds = shift @chunks;
+$seeds =~ s/^seeds:\s+//;
+my @seedsRanges = pairs split /\s+/, $seeds;
+
+foreach my $map (@chunks) {
+    my @lines = split /\n/, $map;
+    my $type = shift @lines;
+    my @list;
+    foreach my $line (@lines) {
+        my ($dest, $src, $len) = split /\s+/, $line;
+        push @list, [$dest, $src, $len];
+    }
+    $map = [$type, \@list];
+}
+
+my $ranges = \@seedsRanges;
+foreach my $chunk (@chunks) {
+    my ($type, $map) = @$chunk;
+    my @nextRanges;
+    foreach my $line (@$map) {
+        last unless @$ranges;
+        my ($dest, $src, $len) = @$line;
+        my @nopeRanges;
+        foreach my $range (@$ranges) {
+            my ($pos, $plen) = @$range;
+            if ($pos + $plen < $src) {
+                push @nopeRanges, [$pos, $plen];
+            } elsif ($pos >= $src + $len) {
+                push @nopeRanges, [$pos, $plen];
+            } else {
+                my $start = max($pos, $src);
+                my $end = min($pos + $plen, $src + $len);
+                my $newPos = $dest + $start - $src;
+                my $newLen = $end - $start;
+                push @nextRanges, [$newPos, $newLen];
+                if ($pos < $src) {
+                    push @nopeRanges, [$pos, $src - $pos];
+                }
+                if ($pos + $plen > $src + $len) {
+                    push @nopeRanges, [$src + $len, $pos + $plen - $src - $len];
+                }
+            }
+        }
+        $ranges = \@nopeRanges;
+    }
+    push @nextRanges, @$ranges;
+    $ranges = \@nextRanges;
+}
+
+my $minStart = min map { $_->[0] } @$ranges;
+print "Min start: $minStart\n";

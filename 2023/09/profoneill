@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+# vim: ft=perl
+
+use strict;
+use warnings;
+use List::Util qw(all);
+use List::MoreUtils qw(slide);
+
+my $part = 1;
+my $sum = 0;
+while (<>) {
+    chomp;
+    my @values = m/(-?\d+)/g;
+    @values = reverse @values if $part == 2;
+    my @difflist;
+    while (1) {
+        unshift @difflist, [@values];
+        last if all { $_ == 0 } @values;
+        @values = slide { $b - $a } @values;
+    }
+    push @{$difflist[0]}, 0;
+    foreach my $l (1..$#difflist) {
+        my $prev = $difflist[$l-1];
+        my $curr = $difflist[$l];
+        push @$curr, $curr->[-1] + $prev->[-1];
+    }
+    $sum += $difflist[-1]->[-1];
+}
+
+print "Sum: $sum\n";
+
