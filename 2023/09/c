@@ -10,17 +10,13 @@ my $part = 1;
 my $sum = 0;
 
 while (<>) {
-    chomp;
-    my @values = m/(-?\d+)/g;
+    my @values = m/-?\d+/g;
     @values = reverse @values if $part == 2;
-    my @lasts;
     while (1) {
-        push @lasts, $values[-1];
+        $sum += $values[-1];
         last if all { $_ == 0 } @values;
         @values = slide { $b - $a } @values;
     }
-
-    $sum += sum @lasts
 }
 print "Sum: $sum\n";
 
