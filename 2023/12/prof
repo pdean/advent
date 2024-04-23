@@ -1,0 +1,72 @@
+#!/usr/bin/env perl
+# vim:ft=perl:
+
+use strict;
+use warnings;
+use List::Util qw(sum);
+
+sub countall($$$$$);
+
+my %memo;
+sub countall($$$$$) {
+    my ($prefix, $space, $groups, $regexes, $pattern) = @_;
+    my $key = join ":", length $prefix, $space, @$groups;
+    return $memo{$key} if exists $memo{$key};
+    my @groups = @$groups;
+    die "No groups" unless @groups;
+    my $group = shift @groups;
+    unless (@groups) {
+        my $newprefix = $prefix . "#" x $group . "_" x $space;
+        my $result = $newprefix =~ m/$regexes->[length $newprefix]/ ? 1 : 0;
+        $memo{$key} = $result;
+        return $result;
+    }
+    my $patLen = length $pattern;
+    my $prefixLen = length $prefix;
+    my $nextPatChar = substr $pattern, $prefixLen, 1;
+    if ($nextPatChar eq "." && $group) {
+        $memo{$key} = 0;
+        return 0;
+    }
+    my $count = 0;
+    my $start = $group == 0 ? 0 : 1;
+    my $neededspaces = @groups ? @groups - 1 : 0;
+    for my $i ($start .. $space - $neededspaces) {
+        my $newspace = $space - $i;
+        my $newprefix = $prefix . ("#" x $group) . ("_" x $i);
+        my $newprefixlen = length $newprefix;
+        last if $newspace < $patLen - $newprefixlen - sum @groups;
+        next if not $newprefix =~ m/$regexes->[length $newprefix]/;
+        $count += countall($newprefix, $newspace, \@groups, $regexes, $pattern);
+    }
+    $memo{$key} = $count;
+    
+    return $count;
+}
+
+my $multiplier = 5;
+
+my $total = 0;
+while (<>) {
+    chomp;
+    %memo = ();
+    my ($pattern, $groups) = split /\s+/;
+    $pattern = join('?', ($pattern) x $multiplier);
+    my @groups = split /,/, $groups;
+    @groups = (@groups) x $multiplier;
+    my $patLen = length $pattern;
+    my $groupsLen = sum @groups;
+    my $space = $patLen - $groupsLen;
+    my @gapgroups = (0, @groups);
+    my $regex = $pattern =~ tr/?.#/._#/r;
+    my @rexexes = map { my $sub = substr $regex, 0, $_; qr/^$sub/ } 0 .. $patLen;
+    print "$pattern / @groups | $patLen $groupsLen => $space\n";
+    my $count = countall("", $space, \@gapgroups, \@rexexes, $pattern);
+    my $memosize = keys %memo;
+    print "==> Count: $count ($memosize calls memoized)\n";
+    $total += $count;
+}
+
+print "Total: $total\n";
+
+

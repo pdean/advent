@@ -1,0 +1,11 @@
+ [LANGUAGE: Perl] — runs in two seconds.
+
+So, this was one where I had to go to bed and sleep on it. I had the basic idea for the bones of the approach when I did part 1, trying to avoid brute-forcing too much. Instead of trying to figure out every individual unknown, just find the gap sizes between the runs of broken springs, using regex matching to check constraints. But although it got the answer, the code was pretty dire.
+
+So I rewrote it what I thought was “the right way” for part 2, and it was pretty efficient for the sample inputs, but not efficient enough for my puzzle input. The problem was that although it pruned infeasible solutions, it touched every feasible solution. That meant it was at least O(answer-value), which was clearly bad given how big the answer seemed like it'd be.
+
+I noticed that for some of the inputs, there was a clear formula for how they grew as we changed the folding multiplier, and I wondered if I could find a general way to figure out the formula for all of them, but that was a blind alley so I went to bed.
+
+In the morning it was obvious memoize. So I did, but then forgot to clear the memo table between lines of input. Oops. But with that bug fixed, it could compute my final answer in Perl in under two seconds.
+
+Gah… 
