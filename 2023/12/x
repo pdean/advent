@@ -1,2 +1,11 @@
 #!/usr/bin/env perl
 # vim:ft=perl:tw=78:sts=4:sw=4:et
+
+while (<>) {
+    chomp;
+    my ($map, $report) = split;
+    my @report = split $report ',';
+    print "$map - @report\n"
+
+
+}
