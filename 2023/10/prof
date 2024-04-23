@@ -1,0 +1,115 @@
+use strict;
+use warnings;
+use List::MoreUtils qw(pairwise);
+use List::Util qw(max);
+
+my @maze;
+
+my $y = 1;
+my $startY;
+my $startX;
+while (<>) {
+    chomp;
+    if (m/^(.*)S/) {
+        $startY = $y;
+        $startX = length($1) + 1;
+    }
+    push @maze, [ ('.', (split //), '.') ];
+    ++$y;
+}
+
+# Add dots to top and bottom
+my $width = scalar @{$maze[0]};
+my $height = scalar @maze;
+my @dots = ('.') x $width;
+unshift @maze, \@dots;
+push @maze, \@dots;
+
+my %linksTo = (
+    '|' => [[0, -1], [0, 1]],
+    '-' => [[-1, 0], [1, 0]],
+    'L' => [[1, 0], [0, -1]],
+    'J' => [[-1, 0], [0, -1]],
+    '7' => [[-1, 0], [0, 1]],
+    'F' => [[1, 0], [0, 1]],
+    '.' => [],
+);
+
+
+# Find the places that connect to the starting point
+my @ends;
+my @start = ($startX, $startY);
+my @dirnames = qw(D U R L);
+my $startKind = "";
+foreach my $dir ([0,1], [0,-1], [1,0], [-1,0]) {
+    my ($dx, $dy) = @$dir;
+    my $dirname = shift @dirnames;
+    my ($x, $y) = pairwise { $a + $b } @start, @$dir;
+    my $tile = $maze[$y][$x];
+    my @links = @{$linksTo{$tile}};
+    foreach my $link (@links) {
+        next unless @$link;
+        my ($ldx, $ldy) = @$link;
+        if ($ldx == -$dx && $ldy == -$dy) {
+            push @ends, [$x, $y];
+            $startKind .= $dirname;
+        }
+    }
+}
+
+my %startShapes = (
+    'DU' => '|',
+    'DR' => 'F',
+    'DL' => '7',
+    'UR' => 'L',
+    'UL' => 'J',
+);
+
+print "Start: $startX, $startY, $startKind, $startShapes{$startKind}\n";
+print "- Links to: $_->[0], $_->[1]\n" foreach @ends;
+
+my %dists;
+$dists{"$startX,$startY"} = 0;
+
+my $dist = 0;
+
+while (@ends) {
+    ++$dist;
+    $dists{"$_->[0],$_->[1]"} = $dist foreach @ends;
+    my @newEnds;
+    foreach my $end (@ends) {
+        my ($x, $y) = @$end;
+        my $tile = $maze[$y][$x];
+        my @links = @{$linksTo{$tile}};
+        foreach my $link (@links) {
+            next unless @$link;
+            my ($ldx, $ldy) = @$link;
+            my ($lx, $ly) = pairwise { $a + $b } @$end, @$link;
+            if (not defined $dists{"$lx,$ly"}) {
+                push @newEnds, [$lx, $ly];
+            }
+        }
+    }
+    @ends = @newEnds;
+}
+
+my $maxDist = max values %dists;
+print "Max dist: $maxDist\n";
+
+# Part 2: Count the number of tiles enclosed by the loop
+
+$maze[$startY][$startX] = $startShapes{$startKind};
+
+# We'll use an inside/outside approach to find the enclosed tiles.
+
+my $insideTotal = 0;
+foreach my $y (1..$height-2) {
+    my $row = join("", map { defined $dists{"$_,$y"} ? $maze[$y][$_] : 'x' } 1..$width-2);
+    $row =~ s/(?:F-*7|L-*J)//g;
+    $row =~ s/(?:F-*J|L-*7)/|/g;
+    $row =~ s/\|(x*)\|/|\U$1\E|/g;
+    $insideTotal += $row =~ tr/X/X/;
+}
+
+print "Total inside: $insideTotal\n";
+

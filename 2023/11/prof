@@ -1,0 +1,52 @@
+use strict;
+use warnings;
+use List::Util qw(zip reductions);
+our ($a, $b);
+
+my @map;
+my @blankY;
+my @galaxies;
+
+my $y = 0;
+while (<>) {
+    chomp;
+    my @line = split //;
+    push @map, \@line;
+    push @blankY, (not m/#/ or 0);
+    for my $x (0..$#line) {
+        if ($line[$x] eq '#') {
+            push @galaxies, [$x, $y];
+        }
+    }
+    ++$y;
+}
+
+my @blankX;
+for my $row (zip(@map)) {
+    push @blankX, (not grep { $_ eq '#' } @$row or 0);
+}
+
+my @bumpsX = reductions { $a + $b } @blankX;
+my @bumpsY = reductions { $a + $b } @blankY;
+
+my $distanceTotal = 0;
+my $pairs = 0;
+my $spaceGap = 1000000;  # Set to 2 for part 1
+--$spaceGap;
+
+foreach my $first (0..$#galaxies) {
+    foreach my $second ($first+1..$#galaxies) {
+        ++$pairs;
+        my ($x1, $y1) = @{$galaxies[$first]};
+        my ($x2, $y2) = @{$galaxies[$second]};
+        ($x1, $x2) = ($x2, $x1) if $x1 > $x2;
+        ($y1, $y2) = ($y2, $y1) if $y1 > $y2;
+        my $bx = $bumpsX[$x2] - $bumpsX[$x1];
+        my $by = $bumpsY[$y2] - $bumpsY[$y1];
+        my $distance = ($bx + $by) * $spaceGap + $x2 - $x1 + $y2 - $y1;
+        $distanceTotal += $distance;
+    }
+}
+
+print "$pairs pairs of galaxies, with a total distance of $distanceTotal\n";
+
