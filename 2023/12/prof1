@@ -44,7 +44,7 @@ sub countall($$$$$) {
     return $count;
 }
 
-my $multiplier = 5;
+my $multiplier = 1;
 
 my $total = 0;
 while (<>) {
@@ -60,6 +60,7 @@ while (<>) {
     my @gapgroups = (0, @groups);
     my $regex = $pattern =~ tr/?.#/._#/r;
     my @rexexes = map { my $sub = substr $regex, 0, $_; qr/^$sub/ } 0 .. $patLen;
+    #    print @rexexes;
     print "$pattern / @groups | $patLen $groupsLen => $space\n";
     my $count = countall("", $space, \@gapgroups, \@rexexes, $pattern);
     my $memosize = keys %memo;

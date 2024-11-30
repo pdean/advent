@@ -1,11 +1,15 @@
 #!/usr/bin/env perl
 # vim:ft=perl:tw=78:sts=4:sw=4:et
 
+use List::Util "sum";
+
 while (<>) {
     chomp;
     my ($map, $report) = split;
-    my @report = split $report ',';
-    print "$map - @report\n"
+    my @report = split /,/, $report;
+    my $maplen = length $map;
+    my $replen = sum @report;
+    print "$map - @report    $maplen-$replen\n";
 
 
 }
