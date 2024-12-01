@@ -26,7 +26,7 @@ for my ( $l, $r ) ( mesh \@l, \@r ) {
 }
 
 for my $l (@l) {
-    $solution_2 += $l * ($t{$l} // 0);
+    $solution_2 += $l * ( $t{$l} // 0 );
 }
 
 say "Solution 1: $solution_1";
