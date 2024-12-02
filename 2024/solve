@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-# vim:ft=perl:sts=4:sw=4:et
 
 use v5.38;
 use List::Util qw(sum);
@@ -14,4 +13,6 @@ say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";
 
 __END__
+# :%! perltidy -pbp -xci
+# vim:ft=perl:sts=4:sw=4:et
 
