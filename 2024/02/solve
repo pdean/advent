@@ -35,7 +35,7 @@ sub check {
     my $len    = @diffs;
     my $pos    = grep { $_ > 0 } @diffs;
     my $neg    = grep { $_ < 0 } @diffs;
-    my $zero   = grep { $_ == 0 } @diffs;
+    my $zero   = grep { $_ == 0 } @diffs; #not needed!
     my $max    = grep { abs($_) > 3 } @diffs;
     my $errs   = $max + $zero;
 
