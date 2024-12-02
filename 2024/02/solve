@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-# vim:ft=perl:sts=4:sw=4:et
 
 use v5.38;
 use List::MoreUtils qw(slide);
@@ -47,3 +46,4 @@ sub check {
 }
 __END__
 
+# vim:ft=perl:sts=4:sw=4:et
