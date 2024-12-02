@@ -2,6 +2,8 @@
 # vim:ft=perl:sts=4:sw=4:et
 
 use v5.38;
+use List::Util qw(sum);
+use List::MoreUtils qw(:all);
 
 @ARGV = "input" unless @ARGV;
 
