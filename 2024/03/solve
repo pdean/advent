@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use v5.38;
-use List::Util qw(sum);
+use List::Util      qw(sum);
 use List::MoreUtils qw(:all);
 
 @ARGV = "input" unless @ARGV;
