@@ -2,7 +2,6 @@
 # vim:ft=perl:sts=4:sw=4:et
 
 use v5.38;
-use List::Util      qw(all max min);
 use List::MoreUtils qw(slide);
 
 @ARGV = "input" unless @ARGV;
@@ -26,7 +25,6 @@ while (<>) {
             }
         }
     }
-    say "";
 }
 
 say "Solution 1: $solution_1";
@@ -43,9 +41,6 @@ sub check {
     my $errs   = $max + $zero;
 
     if ( ( ( $pos == $len ) || ( $neg == $len ) ) && ( $errs == 0 ) ) {
-        say "@levels";
-        say "@diffs";
-        say "$len $pos $neg $max $zero $errs";
         return 1;
     }
     return 0;
