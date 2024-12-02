@@ -45,5 +45,5 @@ sub check {
     return 0;
 }
 __END__
-
+# :%! perltidy -pbp -xci
 # vim:ft=perl:sts=4:sw=4:et
