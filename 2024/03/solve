@@ -5,7 +5,7 @@ use v5.38;
 
 my $solution_1 = 0;
 my $solution_2 = 0;
-my $do = 1;
+my $do         = 1;
 
 while (<>) {
     my @matches = m/mul\(\d+,\d+\)/g;
