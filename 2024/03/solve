@@ -1,13 +1,28 @@
 #!/usr/bin/perl
 
 use v5.38;
-use List::Util      qw(sum);
-use List::MoreUtils qw(:all);
-
 @ARGV = "input" unless @ARGV;
 
 my $solution_1 = 0;
 my $solution_2 = 0;
+my $do = 1;
+
+while (<>) {
+    my @matches = m/mul\(\d+,\d+\)/g;
+    for (@matches) {
+        m/(\d+),(\d+)/;
+        $solution_1 += $1 * $2;
+    }
+
+    @matches = m/mul\(\d+,\d+\)|don't\(\)|do\(\)/g;
+    for (@matches) {
+        if (m/^don/) { $do = 0; next; }
+        if (m/^do/)  { $do = 1; next; }
+        if (m/(\d+),(\d+)/) {
+            if ($do) { $solution_2 += $1 * $2; }
+        }
+    }
+}
 
 say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";
