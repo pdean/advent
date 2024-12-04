@@ -18,9 +18,8 @@ while (<>) {
     for (@matches) {
         if (m/^don/) { $do = 0; next; }
         if (m/^do/)  { $do = 1; next; }
-        if (m/(\d+),(\d+)/) {
-            if ($do) { $solution_2 += $1 * $2; }
-        }
+        m/(\d+),(\d+)/;
+        if ($do) { $solution_2 += $1 * $2; }
     }
 }
 
