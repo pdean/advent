@@ -1,16 +1,80 @@
 #!/usr/bin/perl
 
 use v5.38;
-use List::Util qw(sum);
-use List::MoreUtils qw(:all);
 
 @ARGV = "input" unless @ARGV;
 
 my $solution_1 = 0;
 my $solution_2 = 0;
 
+my @grid;
+
+while (<>) {
+    chomp;
+    push @grid, [ split '' ];
+}
+
+my $m = $#grid;
+my $n = $#{ $grid[0] };
+
+for my $i ( 0 .. $m ) {
+    for my $j ( 0 .. $n ) {
+        my $c = $grid[$i][$j];
+        next if $c ne 'X';
+        for my $di ( -1, 0, 1 ) {
+            for my $dj ( -1, 0, 1 ) {
+                next          if $di == 0 && $dj == 0;
+                ++$solution_1 if check1( $i, $j, $di, $dj );
+            }
+        }
+    }
+}
+
+for my $i ( 0 .. $m ) {
+    for my $j ( 0 .. $n ) {
+        my $c = $grid[$i][$j];
+        next          if $c ne 'A';
+        ++$solution_2 if check2( $i, $j );
+    }
+}
+
 say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";
+
+sub check1 {
+    my ( $i, $j, $di, $dj ) = @_;
+    my @xmas = qw(X M A S);
+    for my $s ( 1 .. 3 ) {
+        my $is = $i + $s * $di;
+        return 0 if $is < 0 || $is > $m;
+        my $js = $j + $s * $dj;
+        return 0 if $js < 0 || $js > $n;
+        return 0 if $grid[$is][$js] ne $xmas[$s];
+    }
+    return 1;
+}
+
+sub check2 {
+    my ( $i, $j ) = @_;
+    my $i1 = $i - 1;
+    return 0 if $i1 < 0;
+    my $i2 = $i + 1;
+    return 0 if $i2 > $m;
+    my $j1 = $j - 1;
+    return 0 if $j1 < 0;
+    my $j2 = $j + 1;
+    return 0 if $j2 > $n;
+    my $c1 = $grid[$i1][$j1];
+    my $c2 = $grid[$i2][$j1];
+    my $c3 = $grid[$i1][$j2];
+    my $c4 = $grid[$i2][$j2];
+    my $x1 = "$c1$c4";
+    my $x2 = "$c3$c2";
+    return 1
+        if ( grep { $x1 eq $_ } qw(MS SM) )
+        && ( grep { $x2 eq $_ } qw(MS SM) );
+    return 0;
+}
 
 __END__
 # :%! perltidy -pbp -xci
