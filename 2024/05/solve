@@ -1,18 +1,26 @@
 #!/usr/bin/perl
+# vim:ft=perl
 
 use v5.38;
-use List::Util qw(sum);
-use List::MoreUtils qw(:all);
 
-@ARGV = "input" unless @ARGV;
+@ARGV = shift // "input";
+
+my %rules;
 
 my $solution_1 = 0;
 my $solution_2 = 0;
 
+while (<>) {
+    last unless /^([0-9]+)\|([0-9]+)/;
+    $rules{$1}{$2} = -( $rules{$2}{$1} = 1 );
+}
+
+while (<>) {
+    my @sort = sort { $rules{$a}{$b} } my @list = /[0-9]+/g;
+    if   ( "@list" eq "@sort" ) { $solution_1 += $list[ @list / 2 ] }
+    else                        { $solution_2 += $sort[ @sort / 2 ] }
+}
+
 say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";
-
-__END__
-# :%! perltidy -pbp -xci
-# vim:ft=perl:sts=4:sw=4:et
 

@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+use v5.38;
+use List::Util qw(sum);
+use List::MoreUtils qw(:all);
+
+@ARGV = "input" unless @ARGV;
+
+my $solution_1 = 0;
+my $solution_2 = 0;
+
+$/ = '';
+my @parts = <>;
+my %order;
+
+for my $line (split /\n/, $parts[0])  {
+    my ($k, $v) = split /\|/, $line;
+    push @{$order{$k}}, $v;
+}
+
+A:
+for my $line (split /\n/, $parts[1]) {
+    my @pages = split /,/, $line;
+    my @pairs = slide {[$a, $b]} @pages;
+    for my $pair (@pairs) {
+        my ($p1, $p2) = @$pair;
+        next A if not defined $order{$p1};
+        my @ord = @{$order{$p1}};
+        next A unless grep {$p2 eq $_} @ord;
+    }
+    my $mid = $#pages/2;
+    $solution_1 += $pages[$mid];
+}
+
+
+say "Solution 1: $solution_1";
+say "Solution 2: $solution_2";
+
+__END__
+# :%! perltidy -pbp -xci
+# vim:ft=perl:sts=4:sw=4:et
+
