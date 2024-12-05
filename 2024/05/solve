@@ -11,12 +11,12 @@ my $solution_1 = 0;
 my $solution_2 = 0;
 
 while (<>) {
-    last unless /^([0-9]+)\|([0-9]+)/;
+    last unless /^(\d+)\|(\d+)/;
     $rules{$1}{$2} = -( $rules{$2}{$1} = 1 );
 }
 
 while (<>) {
-    my @sort = sort { $rules{$a}{$b} } my @list = /[0-9]+/g;
+    my @sort = sort { $rules{$a}{$b} } my @list = /\d+/g;
     if   ( "@list" eq "@sort" ) { $solution_1 += $list[ @list / 2 ] }
     else                        { $solution_2 += $sort[ @sort / 2 ] }
 }
