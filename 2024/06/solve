@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+use v5.38;
+
+@ARGV = shift // "input";
+
+my $solution_1 = 0;
+my $solution_2 = 0;
+
+say "Solution 1: $solution_1";
+say "Solution 2: $solution_2";
+
+# vim:ft=perl:sts=4:sw=4:et
