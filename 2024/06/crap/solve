@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+use v5.38;
+
+@ARGV = shift // "input";
+
+my $solution_1 = 1;
+my $solution_2 = 0;
+
+my $input = [map {[/./g, ("B")]} <>];
+my $X     = @{$$input [0]}-2;
+my $Y     = @$input-1;
+push @$input, [("B") x @{$$input [0]}];
+
+my ($gx, $gy);
+my @rx = (0,1,0,-1);
+my @ry = (-1,0,1,0);
+my $d = 0;
+
+SCH:
+for my $y (0 .. $Y) {
+    for my $x (0 .. $X) {
+        my $c = $$input[$y][$x];
+        if ($c eq "^") {
+            $gx = $x;
+            $gy = $y;
+            $$input[$y][$x] = 'X';
+            last SCH;
+        }
+    }
+}
+say "$gx  $gy";
+LOOP:
+while (1) {
+    my $dx = $rx[$d];
+    my $dy = $ry[$d];
+    $gx += $dx;
+    $gy += $dy;
+    my $c = $$input[$gy][$gx];
+    say "$gx  $gy $c";
+    if ($c eq '.') {
+        ++$solution_1;
+        $$input[$gy][$gx] = 'X';
+    }
+    my $n = $$input[$gy+$dy][$gx+$dx];
+    last LOOP if $n eq "B";
+    next LOOP if $n ne '#';
+    $d = ++$d % 4;
+}
+
+say "Solution 1: $solution_1";
+say "Solution 2: $solution_2";
+
+# vim:ft=perl:sts=4:sw=4:et

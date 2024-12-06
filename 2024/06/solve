@@ -1,11 +1,61 @@
 #!/usr/bin/perl
 
 use v5.38;
+use feature qw(multidimensional);
 
 @ARGV = shift // "input";
 
-my $solution_1 = 0;
+my $solution_1 = 1;
 my $solution_2 = 0;
+
+my $grid = [ map { [ /./g, ("B") ] } <> ];
+my $X    = @{ $$grid[0] } - 2;
+my $Y    = @$grid - 1;
+push @$grid, [ ("B") x @{ $$grid[0] } ];
+
+my @rx = (  0, 1, 0, -1 );
+my @ry = ( -1, 0, 1,  0 );
+my @g;
+
+SCH:
+for my $y ( 0 .. $Y ) {
+    for my $x ( 0 .. $X ) {
+        my $c = $$grid[$y][$x];
+        if ( $c eq "^" ) {
+            @g = ( $x, $y, 0 );
+            last SCH;
+        }
+    }
+}
+
+sub patrol {
+    my ( $x, $y, $d ) = @_;
+    my %v;
+
+    while (1) {
+        return 0 if $v{ $x, $y }{$d}++;
+        my ( $dx, $dy ) = ( $rx[$d], $ry[$d] );
+        my $c = $$grid[ $y + $dy ][ $x + $dx ];
+        return keys %v if $c eq "B";
+        if ( $c ne '#' ) {
+            $x += $dx;
+            $y += $dy;
+        }
+        else {
+            $d = ++$d % 4;
+        }
+    }
+}
+
+my @path = patrol(@g);
+$solution_1 = @path;
+
+for my $pos (@path) {
+    my ( $x, $y ) = split $;, $pos;
+    $$grid[$y][$x] = '#';
+    ++$solution_2 if not patrol(@g);
+    $$grid[$y][$x] = '.';
+}
 
 say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";

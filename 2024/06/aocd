@@ -1,4 +1,5 @@
 #!/bin/sh
 aoc d -o  -y 2024 -d 6 
 pandoc puzzle.md -o puzzle.pdf
-atril puzzle.pdf
+lpr puzzle.pdf
+#atril puzzle.pdf
