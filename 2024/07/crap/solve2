@@ -8,44 +8,29 @@ use integer;
 my $solution_1 = 0;
 my $solution_2 = 0;
 
-my $types = 3;
+sub calc {
+    my ( $type, $result, @factors ) = @_;
+    my $n = @factors - 1;
+    for my $ops ( 0 .. ( $type**$n ) - 1 ) {
+        my ( $x, @stack ) = @factors;
+        my $op = $ops;
+        while ( my $y = shift @stack ) {
+            my $r = $op % $type;
+            $op /= $type;
+            if    ( $r == 0 )    { $x += $y; }
+            elsif ( $r == 1 )    { $x *= $y; }
+            elsif ( $type == 3 ) { $x .= $y; }
+        }
+        return 1 if $x == $result;
+    }
+    return 0;
+}
 
 INPUT:
 while (<>) {
     my ( $result, @factors ) = /\d+/g;
-    my $n = @factors - 1;
-
-OP:
-    for my $ops ( 0 .. ( $types**$n ) - 1 ) {
-        my ( $x, @stack ) = @factors;
-        my $op = $ops;
-        my $t3 = 0;
-        while ( my $y = shift @stack ) {
-            my $r = $op % $types;
-            $op /= $types;
-            if ( $r == 0 ) {
-                $x += $y;
-            }
-            elsif ( $r == 1 ) {
-                $x *= $y;
-            }
-            elsif ( $r == 2 ) {
-                $t3 = 1;
-                $x  = int $x . $y;
-            }
-            next OP if $x > $result;
-        }
-        if ( $x == $result ) {
-            if ( !$t3 ) {
-                $solution_1 += $result;
-                $solution_2 += $result;
-            }
-            if ($t3) {
-                $solution_2 += $result;
-            }
-            next INPUT;
-        }
-    }
+    $solution_1 += $result if calc( 2, $result, @factors );
+    $solution_2 += $result if calc( 3, $result, @factors );
 }
 
 say "Solution 1: $solution_1";
