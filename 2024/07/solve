@@ -1,49 +1,29 @@
 #!/usr/bin/perl
 
 use v5.38;
-use bigint;
+use integer;
 
 @ARGV = shift // "input";
 
 my $solution_1 = 0;
 my $solution_2 = 0;
 
-my $types = 3;
+sub results;
 
-LOOP:
+sub results ( $part, $f = undef, $s = undef, @rest ) {
+    return
+          !defined $f ? ()
+        : !defined $s ? $f
+        : ( results( $part, $f + $s, @rest ),
+            results( $part, $f * $s, @rest ),
+            $part == 1 ? () : results( $part, $f . $s, @rest ),
+        );
+}
+
 while (<>) {
-    my ( $result, $rest ) = split /:\s*/, $_, 2;
-    my @factors = split ' ', $rest;
-    my $n       = @factors - 1;
-    for my $ops ( 0 .. ( $types**$n ) - 1 ) {
-        my ( $x, @stack ) = @factors;
-        my $op = $ops;
-        my $t3 = 0;
-        while ( my $y = shift @stack ) {
-            my $r = $op % $types;
-            $op /= $types;
-            if ( $r == 0 ) {
-                $x += $y;
-            }
-            elsif ( $r == 1 ) {
-                $x *= $y;
-            }
-            else {
-                $t3 = 1;
-                $x .= $y;
-            }
-        }
-        if ( $x == $result ) {
-            if ( !$t3 ) {
-                $solution_1 += $result;
-                $solution_2 += $result;
-            }
-            if ($t3) {
-                $solution_2 += $result;
-            }
-            next LOOP;
-        }
-    }
+    my ( $total, @parts ) = /[0-9]+/g;
+    $solution_1 += $total if grep { $_ == $total } results 1, @parts;
+    $solution_2 += $total if grep { $_ == $total } results 2, @parts;
 }
 
 say "Solution 1: $solution_1";

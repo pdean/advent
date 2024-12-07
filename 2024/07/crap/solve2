@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+use v5.38;
+use integer;
+
+@ARGV = shift // "input";
+
+my $solution_1 = 0;
+my $solution_2 = 0;
+
+my $types = 3;
+
+INPUT:
+while (<>) {
+    my ( $result, @factors ) = /\d+/g;
+    my $n = @factors - 1;
+
+OP:
+    for my $ops ( 0 .. ( $types**$n ) - 1 ) {
+        my ( $x, @stack ) = @factors;
+        my $op = $ops;
+        my $t3 = 0;
+        while ( my $y = shift @stack ) {
+            my $r = $op % $types;
+            $op /= $types;
+            if ( $r == 0 ) {
+                $x += $y;
+            }
+            elsif ( $r == 1 ) {
+                $x *= $y;
+            }
+            elsif ( $r == 2 ) {
+                $t3 = 1;
+                $x  = int $x . $y;
+            }
+            next OP if $x > $result;
+        }
+        if ( $x == $result ) {
+            if ( !$t3 ) {
+                $solution_1 += $result;
+                $solution_2 += $result;
+            }
+            if ($t3) {
+                $solution_2 += $result;
+            }
+            next INPUT;
+        }
+    }
+}
+
+say "Solution 1: $solution_1";
+say "Solution 2: $solution_2";
+
+# vim:ft=perl:sts=4:sw=4:et
