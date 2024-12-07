@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+
+use v5.38;
+use integer;
+use List::Util qw[max];
+
+@ARGV = shift // "input";
+
+my $solution_1 = 0;
+my $solution_2 = 0;
+
+sub results;
+
+sub results ( $part, $f = undef, $s = undef, @rest ) {
+    return
+          !defined $f ? ()
+        : !defined $s ? $f
+        : ( results( $part, $f + $s, @rest ),
+            results( $part, $f * $s, @rest ),
+            $part == 1 ? () : results( $part, $f . $s, @rest ),
+        );
+}
+
+my ( $len1, $len2, $len ) = ( 0, 0, 0 );
+
+while (<>) {
+    my ( $total, @parts ) = /[0-9]+/g;
+    $len = max $len, scalar @parts;
+
+    my @results1 = results 1, @parts;
+    $len1 = max $len1, scalar @results1;
+    $solution_1 += $total if grep { $_ == $total } @results1;
+    my @results2 = results 2, @parts;
+    $len2 = max $len2, scalar @results2;
+    $solution_2 += $total if grep { $_ == $total } @results2;
+
+}
+
+say "Solution 1: $solution_1";
+say "Solution 2: $solution_2";
+say "max length part1 = $len1";
+say "max length part2 = $len2";
+say "max length parts = $len";
+
+# vim:ft=perl:sts=4:sw=4:et
