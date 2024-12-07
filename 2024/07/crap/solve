@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+use v5.38;
+
+@ARGV = shift // "input";
+
+my $solution_1 = 0;
+my $solution_2 = 0;
+
+LOOP:
+while (<>) {
+    my ( $result, $rest ) = split /:\s*/, $_, 2;
+    my @factors = split ' ', $rest;
+    my $on = @factors - 1;
+    for my $op ( 0 .. ( 2**$on ) - 1 ) {
+        my @ops = split '', sprintf '%0*b', $on, $op;
+        my ($ans, @stack) = @factors;
+        while (my $x = shift @stack) {
+            my $o = shift @ops;
+            if ($o eq '0') {
+                $ans += $x;
+            }
+            else {
+                $ans *= $x;
+            }
+        }
+        if ($ans == $result) {
+            $solution_1 += $result;
+            next LOOP;
+        }
+    }
+}
+
+say "Solution 1: $solution_1";
+say "Solution 2: $solution_2";
+
+# vim:ft=perl:sts=4:sw=4:et
