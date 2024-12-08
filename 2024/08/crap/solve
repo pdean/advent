@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+use v5.38;
+use feature qw(multidimensional);
+use Data::Dumper;
+
+@ARGV = shift // "input";
+
+my $solution_1 = 0;
+my $solution_2 = 0;
+
+my ( %ant, %nodes );
+
+my $grid = [ map { [/./g] } <> ];
+my $C    = @{ $$grid[0] } - 1;
+my $R    = @$grid - 1;
+
+for my $r ( 0 .. $R ) {
+    for my $c ( 0 .. $C ) {
+        my $a = $$grid[$r][$c];
+        if ( $a ne "." ) {
+            push @{ $ant{$a} }, [ $r, $c ];
+        }
+    }
+}
+
+for my $k ( keys %ant ) {
+    my @ant = @{ $ant{$k} };
+    for my $a1 (@ant) {
+        my ( $r1, $c1 ) = @$a1;
+        for my $a2 (@ant) {
+            my ( $r2, $c2 ) = @$a2;
+            my $rn1 = $r2 + $r2 - $r1;
+            my $cn1 = $c2 + $c2 - $c1;
+            ++$nodes{ $rn1, $cn1 }
+                if 0 <= $rn1 <= $R
+                && 0 <= $cn1 <= $C
+                && $$grid[$rn1][$cn1] ne $k;
+            my $rn2 = $r1 + $r1 - $r2;
+            my $cn2 = $c1 + $c1 - $c2;
+            ++$nodes{ $rn2, $cn2 }
+                if 0 <= $rn2 <= $R
+                && 0 <= $cn2 <= $C
+                && $$grid[$rn2][$cn2] ne $k;
+        }
+    }
+}
+
+$solution_1 = keys %nodes;
+
+say "Solution 1: $solution_1";
+say "Solution 2: $solution_2";
+
+# vim:ft=perl:sts=4:sw=4:et
