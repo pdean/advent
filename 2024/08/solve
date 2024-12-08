@@ -9,7 +9,7 @@ use Data::Dumper;
 my $solution_1 = 0;
 my $solution_2 = 0;
 
-my ( %ant, %node );
+my ( %ant, %nodes1, %nodes2 );
 
 my $grid = [ map { [/./g] } <> ];
 my $C    = @{ $$grid[0] } - 1;
@@ -24,26 +24,39 @@ for my $r ( 0 .. $R ) {
     }
 }
 
-for my $k ( keys %ant ) {
-    my @a = @{ $ant{$k} };
-    next if @a < 2;
-    for my $i ( 0 .. $#a ) {
-        for my $j ( 0 .. $#a ) {
-            next if $i == $j;
-            my ( $ri, $ci ) = @{ $a[$i] };
-            my ( $rj, $cj ) = @{ $a[$j] };
-            my $rn = $rj + $rj - $ri;
-            my $cn = $cj + $cj - $ci;
-            if (   0 <= $rn <= $R
-                && 0 <= $cn <= $C )
-            {
-                $node{$rn,$cn}++;
+for my $r ( 0 .. $R ) {
+    for my $c ( 0 .. $C ) {
+        for my $k ( keys %ant ) {
+            my @a = @{ $ant{$k} };
+            next if @a < 2;
+            for my $i ( 0 .. $#a ) {
+                for my $j ( 0 .. $#a ) {
+                    next if $i == $j;
+                    my ( $ri, $ci ) = @{ $a[$i] };
+                    my ( $rj, $cj ) = @{ $a[$j] };
+
+                    my $di = abs( $r - $ri ) + abs( $c - $ci );
+                    my $dj = abs( $r - $rj ) + abs( $c - $cj );
+
+                    my $dri = $r - $ri;
+                    my $dci = $c - $ci;
+                    my $drj = $r - $rj;
+                    my $dcj = $c - $cj;
+
+                    if ( $dri * $dcj == $dci * $drj ) {
+                        if ( $di == 2 * $dj || $dj == 2 * $di ) {
+                            ++$nodes1{ $r, $c };
+                        }
+                        ++$nodes2{ $r, $c };
+                    }
+                }
             }
         }
     }
 }
 
-$solution_1 = keys %node;
+$solution_1 = keys %nodes1;
+$solution_2 = keys %nodes2;
 
 say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";
