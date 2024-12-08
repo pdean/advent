@@ -11,10 +11,10 @@ my $solution_2 = 0;
 sub calc {
     my ( $type, $result, @factors ) = @_;
     my $n = @factors - 1;
-    for my $op ( 0 .. ( $type**$n ) - 1 ) {
+    for ( my $i = 0; $i < $type**$n; ++$i ) {
         my ( $x, @stack ) = @factors;
-        #        my $op = $ops;
-        while ( my $y = shift @stack ) {
+        my $op = $i;
+        for my $y (@stack) {
             my $r = $op % $type;
             $op /= $type;
             if    ( $r == 0 )    { $x += $y; }
