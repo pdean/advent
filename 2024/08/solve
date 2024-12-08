@@ -2,7 +2,6 @@
 
 use v5.38;
 use feature qw(multidimensional);
-use Data::Dumper;
 
 @ARGV = shift // "input";
 
