@@ -1,12 +1,40 @@
 #!/usr/bin/perl
 
 use v5.38;
-use feature qw(multidimensional);
+use integer;
 
 @ARGV = shift // "input";
 
 my $solution_1 = 0;
 my $solution_2 = 0;
+
+my $line = <>;
+my @map  = $line =~ /./g;
+my @B;
+
+push @map, 0 if @map % 2;
+my $id = 0;
+
+for my ( $file, $free ) (@map) {
+    push @B, $id for 1 .. $file;
+    push @B, '.' for 1 .. $free;
+    $id++;
+}
+
+my ( $l, $r ) = ( 0, $#B );
+
+LOOP:
+while (1) {
+    while ( $B[$l] ne '.' ) { ++$l }
+    while ( $B[$r] eq '.' ) { --$r }
+    @B[ $l, $r ] = @B[ $r, $l ];
+    last if ++$l >= --$r;
+}
+
+while ( my ( $i, $b ) = each @B ) {
+    last if $b eq '.';
+    $solution_1 += $i * $b;
+}
 
 say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";
