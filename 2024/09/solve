@@ -2,6 +2,7 @@
 
 use v5.38;
 use integer;
+use List::Util qw[sum];
 
 @ARGV = shift // "input";
 
@@ -65,5 +66,8 @@ while ( my ( $i, $b ) = each @B2 ) {
 
 say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";
+say "length of disk map: ", scalar @B;
+say "by sum: ", sum @map;
+say "length of input: ", scalar @map;
 
 # vim:ft=perl:sts=4:sw=4:et
