@@ -47,8 +47,7 @@ while (1) {
     for my $l ( 0 .. $r - 1 ) {
         my ( $free, $space ) = @{ $frees[$l] };
         next if $len > $space;
-        $files[$r] = [ $free, $len ];
-        for my $i ( 1 .. $len ) {
+        for ( 1 .. $len ) {
             @B2[ $free, $file ] = @B2[ $file, $free ];
             ++$file;
             ++$free;
