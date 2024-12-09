@@ -13,16 +13,16 @@ my @map  = $line =~ /./g;
 push @map, 0 if @map % 2;
 
 my ( @B, @files, @frees );
-my $id = 0;
+my $file = 0;
 
 # build disk map
 # keep file and free space for part 2
-for my ( $file, $free ) (@map) {
-    $files[$id] = [ scalar @B, $file ];
-    push @B, $id for 1 .. $file;
-    $frees[$id] = [ scalar @B, $free ];
-    push @B, '.' for 1 .. $free;
-    $id++;
+for my ( $len, $space ) (@map) {
+    $files[$file] = [ scalar @B, $len ];
+    push @B, $file for 1 .. $len;
+    $frees[$file] = [ scalar @B, $space ];
+    push @B, '.' for 1 .. $space;
+    $file++;
 }
 
 # part1
@@ -41,7 +41,7 @@ while ( my ( $i, $b ) = each @B1 ) {
 
 # part2
 my @B2 = @B;
-$r = $id - 1;
+$r = $file - 1;
 while (1) {
     my ( $file, $len ) = @{ $files[$r] };
     for my $l ( 0 .. $r - 1 ) {
