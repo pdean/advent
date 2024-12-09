@@ -8,32 +8,60 @@ use integer;
 my $solution_1 = 0;
 my $solution_2 = 0;
 
-my $line = <>;
+my $line = readline;
 my @map  = $line =~ /./g;
-my @B;
-
 push @map, 0 if @map % 2;
+
+my ( @B, @files, @frees );
 my $id = 0;
 
+# build disk map
+# keep file and free space for part 2
 for my ( $file, $free ) (@map) {
+    $files[$id] = [ scalar @B, $file ];
     push @B, $id for 1 .. $file;
+    $frees[$id] = [ scalar @B, $free ];
     push @B, '.' for 1 .. $free;
     $id++;
 }
 
-my ( $l, $r ) = ( 0, $#B );
-
-LOOP:
+# part1
+my @B1 = @B;
+my ( $l, $r ) = ( 0, $#B1 );
 while (1) {
-    while ( $B[$l] ne '.' ) { ++$l }
-    while ( $B[$r] eq '.' ) { --$r }
-    @B[ $l, $r ] = @B[ $r, $l ];
+    while ( $B1[$l] ne '.' ) { ++$l }
+    while ( $B1[$r] eq '.' ) { --$r }
+    @B1[ $l, $r ] = @B1[ $r, $l ];
     last if ++$l >= --$r;
 }
-
-while ( my ( $i, $b ) = each @B ) {
-    last if $b eq '.';
+while ( my ( $i, $b ) = each @B1 ) {
+    next if $b eq '.';
     $solution_1 += $i * $b;
+}
+
+# part2
+my @B2 = @B;
+$r = $id - 1;
+while (1) {
+    my ( $file, $len ) = @{ $files[$r] };
+    for my $l ( 0 .. $r - 1 ) {
+        my ( $free, $space ) = @{ $frees[$l] };
+        next if $len > $space;
+        $files[$r] = [ $free, $len ];
+        for my $i ( 1 .. $len ) {
+            @B2[ $free, $file ] = @B2[ $file, $free ];
+            ++$file;
+            ++$free;
+            --$space;
+        }
+        $frees[$l] = [ $free, $space ];
+        last;
+    }
+    last if --$r == 0;
+}
+while ( my ( $i, $b ) = each @B2 ) {
+    next if $b eq '.';
+    $solution_2 += $i * $b;
 }
 
 say "Solution 1: $solution_1";
