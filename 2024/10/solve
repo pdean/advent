@@ -20,7 +20,6 @@ for my $r ( 0 .. $R ) {
             $solution_1 += count($r, $c);
         }
     }
-    print "\n";
 }
 
 say "Solution 1: $solution_1";
@@ -29,9 +28,31 @@ say "Solution 2: $solution_2";
 sub count {
     my ($r, $c) = @_;
 
+    my @Q;
+    push @Q, [$r, $c, 0, 0];
+    my %V{$r, $c,0, 0}++;
+    my $count;
 
-
-
+    Q:
+    while (@Q) {
+        my ($r, $c, $d, $n) = shift @Q;
+        for my $dc (-1, 1) {
+            my $nc = $c + $dc;
+            for my $dr (-1 1) {
+                my $nr = $r + $dr;
+                next if $V{$nr, $nc, $d, $n};
+                my $h = $$grid[$nr][$nc];
+                if ($h == 9) {
+                    ++$count;
+                    next Q;
+                }
+                if (($h - $d) == 1) {
+                    push @Q, [$nr, $nc, $h, $n];
+                }
+            }
+        }
+    }
+    return $count;
 }
 
 # vim:ft=perl:sts=4:sw=4:et
