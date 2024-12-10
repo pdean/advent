@@ -39,6 +39,7 @@ sub count {
             my $nc = $c + $dc;
             next unless 0 <= $nr <= $R && 0 <= $nc <= $C;
             my $h = $$grid[$nr][$nc];
+            next unless $h =~ /\d/;
             if ( ( $h - $d ) == 1 ) {
                 if ($v) {
                     next if $V{ $nr, $nc }++;
