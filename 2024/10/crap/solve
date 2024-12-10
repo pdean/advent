@@ -8,7 +8,7 @@ use feature qw(multidimensional);
 my $solution_1 = 0;
 my $solution_2 = 0;
 
-my $grid = [ map { [ /./g ] } <> ];
+my $grid = [ map { [/./g] } <> ];
 my $C    = @{ $$grid[0] } - 1;
 my $R    = @$grid - 1;
 
@@ -26,14 +26,14 @@ say "Solution 2: $solution_2";
 
 sub count {
     my ( $r0, $c0 ) = @_;
-    my (@Q, %V);
+    my ( @Q, %V );
     push @Q, [ $r0, $c0, 0 ];
     $V{ $r0, $c0 }++;
     my $count = 0;
 
     while (@Q) {
         my ( $r, $c, $d ) = @{ shift @Q };
-        for my ($dr, $dc) ( 0, -1, 1, 0, 0, 1, -1, 0 ) {
+        for my ( $dr, $dc ) ( 0, -1, 1, 0, 0, 1, -1, 0 ) {
             my $nr = $r + $dr;
             my $nc = $c + $dc;
             next unless 0 <= $nr <= $R && 0 <= $nc <= $C;
