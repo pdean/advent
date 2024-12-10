@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+use v5.38;
+use feature qw(multidimensional);
+
+@ARGV = shift // "input";
+
+my $solution_1 = 0;
+my $solution_2 = 0;
+
+my $grid = [ map { [/./g] } <> ];
+my $C    = @{ $$grid[0] } - 1;
+my $R    = @$grid - 1;
+
+for my $r ( 0 .. $R ) {
+    for my $c ( 0 .. $C ) {
+        my $z = $$grid[$r][$c];
+        if ( $z eq '0' ) {
+            $solution_1 += count( $r, $c, 1 );
+            $solution_2 += count( $r, $c, 0 );
+        }
+    }
+}
+
+say "Solution 1: $solution_1";
+say "Solution 2: $solution_2";
+
+sub count {
+    my ( $r0, $c0, $v ) = @_;
+    my ( @Q, %V );
+    push @Q, [ $r0, $c0, 0 ];
+    $V{$r0}{$c0}++;
+    my $count = 0;
+
+    while (@Q) {
+        my ( $r, $c, $d ) = @{ shift @Q };
+        for my ( $dr, $dc ) ( 0, -1, 1, 0, 0, 1, -1, 0 ) {
+            my $nr = $r + $dr;
+            my $nc = $c + $dc;
+            next unless 0 <= $nr <= $R && 0 <= $nc <= $C;
+            my $h = $$grid[$nr][$nc];
+            next unless $h =~ /\d/;
+            if ( ( $h - $d ) == 1 ) {
+                if ($v) {
+                    next if $V{$nr}{$nc}++;
+                }
+                if ( $h == 9 ) {
+                    ++$count;
+                }
+                else {
+                    push @Q, [ $nr, $nc, $h ];
+                }
+            }
+        }
+    }
+    return $count;
+}
+
+# vim:ft=perl:sts=4:sw=4:et
