@@ -5,10 +5,33 @@ use feature qw(multidimensional);
 
 @ARGV = shift // "input";
 
-my $solution_1 = 0;
+my $solution_1 = 1;
 my $solution_2 = 0;
+
+my $grid = [ map { [ /./g, (".") ] } <> ];
+my $C    = @{ $$grid[0] } - 2;
+my $R    = @$grid - 1;
+push @$grid, [ (".") x @{ $$grid[0] } ];
+
+for my $r ( 0 .. $R ) {
+    for my $c ( 0 .. $C ) {
+        my $z = $$grid[$r][$c];
+        if ($z eq '0') {
+            $solution_1 += count($r, $c);
+        }
+    }
+    print "\n";
+}
 
 say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";
+
+sub count {
+    my ($r, $c) = @_;
+
+
+
+
+}
 
 # vim:ft=perl:sts=4:sw=4:et
