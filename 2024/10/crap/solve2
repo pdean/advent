@@ -32,8 +32,8 @@ sub count {
     $V{$r0}{$c0}++;
     my $count = 0;
 
-    while (@Q) {
-        my ( $r, $c, $d ) = @{ shift @Q };
+    while (my $next = shift @Q) {
+        my ( $r, $c, $d ) = @$next;
         for my ( $dr, $dc ) ( 0, -1, 1, 0, 0, 1, -1, 0 ) {
             my $nr = $r + $dr;
             my $nc = $c + $dc;
