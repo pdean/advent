@@ -19,7 +19,7 @@ sub blink {
 
     for ( 1 .. $blinks ) {
         my %new;
-        while ( my ( $key, $value ) = each %hash ) {
+        for my ( $key, $value ) (%hash) {
             if ( $key == 0 ) {
                 $new{1} += $value;
             }
