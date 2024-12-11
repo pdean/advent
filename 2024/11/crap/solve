@@ -1,14 +1,73 @@
 #!/usr/bin/perl
 
 use v5.38;
-use feature qw(multidimensional);
+use integer;
+use List::Util qw[sum];
 
 @ARGV = shift // "input";
 
 my $solution_1 = 0;
 my $solution_2 = 0;
 
+my @stones = <> =~ /\d+/g;
+
+$solution_1 = blink( \@stones, 25 );
+
+#$solution_2 = blink( \@stones, 75 );
+
 say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";
+
+
+sub blink {
+    my ( $stones, $blinks ) = @_;
+
+
+
+    for ( 1 .. $blinks ) {
+        my $new = [];
+
+        for my $stone (@$stones) {
+
+            if ( $stone == 0 ) {
+                push @$new, 1;
+                next;
+            }
+
+            my $string = "$stone";
+            my $digits = length $string;
+            if ( !( $digits % 2 ) ) {
+                my $len   = $digits / 2;
+                my $left  = substr( $string, 0,    $len ) + 0;
+                my $right = substr( $string, $len, $len ) + 0;
+                push @$new, $left;
+                push @$new, $right;
+                next;
+            }
+
+            push @$new, $stone * 2024;
+        }
+        $stones = $new;
+    }
+    my %hash;
+
+    for my $s (@$stones) {
+        $hash{$s}++;
+    }
+
+    say "hash keys ", scalar keys %hash;
+    say "values ", sum values %hash;
+
+    my @keys = sort {$a <=> $b} keys %hash;
+
+    for my $k (@keys) {
+        my $v = $hash{$k};
+        say "$k $v"
+    }
+
+
+
+    return scalar @$stones;
+}
 
 # vim:ft=perl:sts=4:sw=4:et

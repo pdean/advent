@@ -1,14 +1,43 @@
 #!/usr/bin/perl
 
 use v5.38;
-use feature qw(multidimensional);
+use integer;
+use List::Util qw[sum];
 
 @ARGV = shift // "input";
+my @stones = <> =~ /\d+/g;
 
-my $solution_1 = 0;
-my $solution_2 = 0;
+my $solution_1 = blink(25);
+my $solution_2 = blink(75);
 
 say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";
+
+sub blink {
+    my $blinks = shift;
+    my %hash   = map { $_ => 1 } @stones;
+
+    for ( 1 .. $blinks ) {
+        my %new;
+        for my $key ( keys %hash ) {
+            if ( $key == 0 ) {
+                $new{1} += $hash{0};
+            }
+            elsif ( length($key) % 2 == 0 ) {
+                my $len   = length($key) / 2;
+                my $left  = int substr( $key, 0, $len );
+                my $right = int substr( $key, $len );
+                $new{$left}  += $hash{$key};
+                $new{$right} += $hash{$key};
+                next;
+            }
+            else {
+                $new{ $key * 2024 } += $hash{$key};
+            }
+        }
+        %hash = %new;
+    }
+    sum values %hash;
+}
 
 # vim:ft=perl:sts=4:sw=4:et
