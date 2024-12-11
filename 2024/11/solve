@@ -19,20 +19,19 @@ sub blink {
 
     for ( 1 .. $blinks ) {
         my %new;
-        for my $key ( keys %hash ) {
+        while ( my ( $key, $value ) = each %hash ) {
             if ( $key == 0 ) {
-                $new{1} += $hash{0};
+                $new{1} += $value;
             }
-            elsif ( length($key) % 2 == 0 ) {
-                my $len   = length($key) / 2;
+            elsif ( ( my $len = length($key) ) % 2 == 0 ) {
+                $len /= 2;
                 my $left  = int substr( $key, 0, $len );
                 my $right = int substr( $key, $len );
-                $new{$left}  += $hash{$key};
-                $new{$right} += $hash{$key};
-                next;
+                $new{$left}  += $value;
+                $new{$right} += $value;
             }
             else {
-                $new{ $key * 2024 } += $hash{$key};
+                $new{ $key * 2024 } += $value;
             }
         }
         %hash = %new;
