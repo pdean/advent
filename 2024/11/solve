@@ -23,10 +23,10 @@ sub blink {
             if ( $key == 0 ) {
                 $new{1} += $value;
             }
-            elsif ( ( my $len = length($key) ) % 2 == 0 ) {
+            elsif ( ( my $len = length $key ) % 2 == 0 ) {
                 $len /= 2;
-                my $left  = int substr( $key, 0, $len );
-                my $right = int substr( $key, $len );
+                my $left  = int substr $key, 0, $len;
+                my $right = int substr $key, $len;
                 $new{$left}  += $value;
                 $new{$right} += $value;
             }
