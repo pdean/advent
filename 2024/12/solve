@@ -2,8 +2,6 @@
 
 use v5.38;
 
-#use feature qw(multidimensional);
-
 @ARGV = shift // "input";
 
 my $solution_1 = 0;
