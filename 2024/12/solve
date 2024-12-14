@@ -44,8 +44,8 @@ for my $r ( 0 .. $R ) {
                         $n1 = defined $F{ $nr - 1 }{$nc}{$dr}{$dc};
                         $n2 = defined $F{ $nr + 1 }{$nc}{$dr}{$dc};
                     }
-                    ++$sides unless $n1 || $n2;
-                    --$sides if $n1 && $n2;
+                    ++$sides unless $n1 || $n2;    # isolated
+                    --$sides if $n1 && $n2;        # gap filler
 
                     $F{$nr}{$nc}{$dr}{$dc}++;
                     next;
