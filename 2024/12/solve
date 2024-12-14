@@ -32,18 +32,21 @@ for my $r ( 0 .. $R ) {
                 {
                     $perim++;
 
+                    my ( $n1, $n2 );
+
                     if ($dr) {    # side is top or bottom
-                        ++$sides
-                            unless $F{$nr}{ $nc - 1 }{$dr}{$dc}
-                            || $F{$nr}{ $nc + 1 }{$dr}{$dc}
-                            ;     # check adjacent left or right
+                                  # check adjacent left or right
+                        $n1 = defined $F{$nr}{ $nc - 1 }{$dr}{$dc};
+                        $n2 = defined $F{$nr}{ $nc + 1 }{$dr}{$dc};
                     }
                     else {        #side is left or right
-                        ++$sides
-                            unless $F{ $nr - 1 }{$nc}{$dr}{$dc}
-                            || $F{ $nr + 1 }{$nc}{$dr}{$dc}
-                            ;     # check adjacent up or down
+                                  # check adjacent up or down
+                        $n1 = defined $F{ $nr - 1 }{$nc}{$dr}{$dc};
+                        $n2 = defined $F{ $nr + 1 }{$nc}{$dr}{$dc};
                     }
+                    ++$sides unless $n1 || $n2;
+                    --$sides if $n1 && $n2;
+
                     $F{$nr}{$nc}{$dr}{$dc}++;
                     next;
                 }
