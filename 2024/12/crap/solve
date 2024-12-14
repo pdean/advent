@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+
+use v5.38;
+
+@ARGV = shift // "input";
+
+my $solution_1 = 0;
+my $solution_2 = 0;
+
+my $G = [ map { [/./g] } <> ];
+my $C = @{ $$G[0] } - 1;
+my $R = @$G - 1;
+my %V;
+
+for my $r ( 0 .. $R ) {
+    for my $c ( 0 .. $C ) {
+        next if $V{$r}{$c};
+        my $z = $$G[$r][$c];
+        my ( $area, $perim, $sides ) = ( 0, 0, 0 );
+        my ( @Q, %F );
+        push @Q, [ $r, $c ];
+        $V{$r}{$c}++;
+
+        while ( my $next = shift @Q ) {
+            my ( $r, $c ) = @$next;
+            $area++;
+            for my ( $dr, $dc ) ( -1, 0, 0, 1, 1, 0, 0, -1 ) {
+                my $nr = $r + $dr;
+                my $nc = $c + $dc;
+                if (  !( 0 <= $nr <= $R && 0 <= $nc <= $C )
+                    || ( $$G[$nr][$nc] ne $z ) )
+                {
+                    $perim++;
+
+                    if ($dr) {    # side is top or bottom
+                        ++$sides
+                            unless $F{$nr}{ $nc - 1 }{$dr}{$dc}
+                            || $F{$nr}{ $nc + 1 }{$dr}{$dc}
+                            ;     # check adjacent left or right
+                    }
+                    else {        #side is left or right
+                        ++$sides
+                            unless $F{ $nr - 1 }{$nc}{$dr}{$dc}
+                            || $F{ $nr + 1 }{$nc}{$dr}{$dc}
+                            ;     # check adjacent up or down
+                    }
+                    $F{$nr}{$nc}{$dr}{$dc}++;
+                    next;
+                }
+                next if $V{$nr}{$nc};
+                push @Q, [ $nr, $nc ];
+                $V{$nr}{$nc}++;
+            }
+        }
+        $solution_1 += $area * $perim;
+        $solution_2 += $area * $sides;
+    }
+}
+
+say "Solution 1: $solution_1";
+say "Solution 2: $solution_2";
+
+# vim:ft=perl:sts=4:sw=4:et
