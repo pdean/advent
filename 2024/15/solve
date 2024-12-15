@@ -9,11 +9,22 @@ my $solution_1 = 0;
 my $solution_2 = 0;
 
 my %D = ( 'v', [ 1, 0 ], '^', [ -1, 0 ], '<', [ 0, -1 ], '>', [ 0, 1 ] );
+my %N = ( '#', '##', '.', '..', 'O', '[]', '@', '@.' );
 
 $/ = '';
 my $grid  = [ map { [/./g] } split /\n/, <> ];
 my @moves = <> =~ /./g;
 
+my $grid2;
+for my $r (@$grid) {
+    my @n;
+    for my $z (@$r) {
+        push @n, split '', $N{$z};
+    }
+    push @$grid2, [@n];
+}
+
+# part 1
 my $R = @$grid - 1;
 my $C = @{ $$grid[0] } - 1;
 
@@ -61,6 +72,46 @@ for my $r ( 0 .. $R ) {
         my $z = $$grid[$r][$c];
         if ( $z eq 'O' ) {
             $solution_1 += 100 * $r + $c;
+        }
+    }
+}
+
+# part 2
+
+$R = @$grid2 - 1;
+$C = @{ $$grid2[0] } - 1;
+
+for my $r ( 0 .. $R ) {
+    for my $c ( 0 .. $C ) {
+        my $z = $$grid2[$r][$c];
+        if ( $z eq '@' ) {
+            ( $r0, $c0 ) = ( $r, $c );
+            $$grid2[$r][$c] = '.';
+            last;
+        }
+    }
+}
+
+MOVE2:
+for my $m (@moves) {
+    my ( $dr, $dc ) = @{ $D{$m} };
+    my ( $nr, $nc ) = ( $r0 + $dr, $c0 + $dc );
+    my $z = $$grid2[$nr][$nc];
+    next MOVE2 if $z eq '#';
+    if ( $z eq '.' ) {
+        ( $r0, $c0 ) = ( $nr, $nc );
+        next MOVE2;
+    }
+
+    # boxes
+
+}
+
+for my $r ( 0 .. $R ) {
+    for my $c ( 0 .. $C ) {
+        my $z = $$grid2[$r][$c];
+        if ( $z eq '[' ) {
+            $solution_2 += 100 * $r + $c;
         }
     }
 }
