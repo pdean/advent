@@ -8,12 +8,36 @@ use feature qw(multidimensional);
 my $solution_1 = 0;
 my $solution_2 = 0;
 
+my %D = ( 'v', [ 1, 0 ], '^', [ -1, 0 ], '<', [ 0, -1 ], '>', [ 0, 1 ] );
+
 $/ = '';
 my $grid  = [ map { [/./g] } split /\n/, <> ];
 my @moves = <> =~ /./g;
 
-#say "@$_" for @$grid;
-#say "@moves";
+say "@$_" for @$grid;
+
+my $R = @$grid - 1;
+my $C = @{ $$grid[0] } - 1;
+
+#say "$R $C";
+
+my ( $r0, $c0 );
+for my $r ( 0 .. $R ) {
+    for my $c ( 0 .. $C ) {
+        my $z = $$grid[$r][$c];
+        if ( $z eq '@' ) {
+            ( $r0, $c0 ) = ( $r, $c );
+            last;
+        }
+    }
+}
+say "$r0 $c0";
+
+for my $m (@moves) {
+    my ( $dr, $dc ) = @{ $D{$m} };
+    my ( $nr, $nc ) = ( $r0 + $dr, $c0 + $dc );
+
+}
 
 say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";
