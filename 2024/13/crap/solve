@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use v5.38;
+use integer;
+use List::Util qw[min];
+
+@ARGV = shift // "input";
+
+my $solution_1 = 0;
+my $solution_2 = 0;
+
+$/ = '';
+my @data = map { [/\d+/g] } <>;
+
+for (@data) {
+    my ( $ax, $ay, $bx, $by, $px, $py ) = @$_;
+
+    my $af = $ax + $ay;
+    my $bf = $bx + $by;
+    my $pf = $px + $py;
+
+    my @res;
+    for my $a ( 0 .. 100 ) {
+        my $n = $pf - $a * $af;
+        next if $n < 0;
+        my $b = $n / $bf;
+        next if $a*$ax +$b*$bx != $px;
+        next if $a*$ay +$b*$by != $py;
+        next if $b > 100 ;
+        my $tokens = 3 * $a + $b;
+        push @res, $tokens;
+    }
+
+    if (@res) {
+        my $min = min(@res);
+        $solution_1 += $min;
+    }
+}
+
+say "Solution 1: $solution_1";
+say "Solution 2: $solution_2";
+
+# vim:ft=perl:sts=4:sw=4:et
