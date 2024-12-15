@@ -4,40 +4,66 @@ use v5.38;
 
 @ARGV = shift // "input";
 
+my $iter = 100;
+
 #my $X = 11;
 #my $Y = 7;
-my $X = 101;
-my $Y = 103;
-my $MX = int $X/2;
-my $MY = int $Y/2;
+
+my $X  = 101;
+my $Y  = 103;
+my $MX = int $X / 2;
+my $MY = int $Y / 2;
 
 my $solution_1 = 0;
 my $solution_2 = 0;
 
-my @data = map {[/-{0,1}\d+/g]} <>;
+my @data = map { [/-{0,1}\d+/g] } <>;
 
-for (1..100) {
+open my $fh, '>', 'output';
+save_picture(0);
+
+for my $i ( 1 .. $iter ) {
     for my $r (@data) {
-        $$r[0] = ($$r[0] + $$r[2]) % $X;
-        $$r[1] = ($$r[1] + $$r[3]) % $Y;
+        $$r[0] = ( $$r[0] + $$r[2] ) % $X;
+        $$r[1] = ( $$r[1] + $$r[3] ) % $Y;
     }
+    save_picture($i);
 }
 
-my ($q1, $q2, $q3, $q4) = (0,0,0,0);
+my ( $q1, $q2, $q3, $q4 ) = ( 0, 0, 0, 0 );
 
 for my $r (@data) {
-    my ($x, $y) = @$r;
-    
+    my ( $x, $y ) = @$r;
+
     ++$q1 if $x < $MX && $y < $MY;
     ++$q2 if $x > $MX && $y < $MY;
     ++$q3 if $x < $MX && $y > $MY;
     ++$q4 if $x > $MX && $y > $MY;
 }
 
-$solution_1 = $q1*$q2*$q3*$q4;
-
+$solution_1 = $q1 * $q2 * $q3 * $q4;
 
 say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";
+
+sub save_picture {
+    my $i = shift;
+    my @grid;
+    push @grid, [ ('.') x $X ] for 0 .. $Y - 1;
+
+    for my $r (@data) {
+        my ( $x, $y ) = @$r;
+        $grid[$y][$x] = '*';
+    }
+
+    say $fh "$i seconds";
+    for my $line (@grid) {
+        for my $c (@$line) {
+            print $fh $c;
+        }
+        say $fh "";
+    }
+    say $fh "\n\n";
+}
 
 # vim:ft=perl:sts=4:sw=4:et
