@@ -78,6 +78,7 @@ for my $r ( 0 .. $R ) {
 
 # part 2
 
+say "@$_" for @$grid2;
 $R = @$grid2 - 1;
 $C = @{ $$grid2[0] } - 1;
 
@@ -91,6 +92,7 @@ for my $r ( 0 .. $R ) {
         }
     }
 }
+say "$r0 $c0";
 
 MOVE2:
 for my $m (@moves) {
@@ -104,8 +106,46 @@ for my $m (@moves) {
     }
 
     # boxes
+    my (@Q, %V, %D);
+    push @Q, [$r0, $c0];
+    $V{$r0, $c0}++;
 
+    while ( my $next = shift @Q ) {
+        my ( $r, $c ) = @$next;
+        NB:
+        for my ( $vr, $vc ) ( -1, 0, 0, 1, 1, 0, 0, -1 ) {
+            my $br = $r + $vr;
+            my $bc = $c + $vc;
+            my $b = $$grid2[$br][$bc];
+            next MOVE2 if $vr == $dr && $vc == $dc && $b eq '#';
+            next NB if $b eq '#';
+            if ($b eq '.') {
+                $D{$r, $c}++ if $vr == -$dr && $vc == -$dc; 
+                next NB;
+            }
+            next if $V{$br, $bc};
+            push @Q, [ $br, $bc ];
+            $V{$br, $bc}++;
+        }
+    }
+    # move boxes
+    my @new;
+    for my ($k, $v) (%V) {
+        my ($r, $c) = split $;, $k;
+        push @new, [$r+$dr, $c+$dc, $$grid2[$r][$c]];
+    }
+    for my ($k, $v) (%D) {
+        my ($r, $c) = split $;, $k;
+        push @new, [$r, $c, '.'];
+    }
+    for my $p (@new) {
+        my ($r, $c, $z) = @$p;
+        $$grid2[$r][$c] = $z;
+    }
 }
+        
+say "@$_" for @$grid2;
+
 
 for my $r ( 0 .. $R ) {
     for my $c ( 0 .. $C ) {
