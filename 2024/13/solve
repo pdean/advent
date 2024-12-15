@@ -1,43 +1,37 @@
 #!/usr/bin/perl
 
 use v5.38;
-use integer;
-use List::Util qw[min];
-
 @ARGV = shift // "input";
 
 my $solution_1 = 0;
 my $solution_2 = 0;
+my $err        = 10000000000000;
 
 $/ = '';
 my @data = map { [/\d+/g] } <>;
 
 for (@data) {
     my ( $ax, $ay, $bx, $by, $px, $py ) = @$_;
-
-    my $af = $ax + $ay;
-    my $bf = $bx + $by;
-    my $pf = $px + $py;
-
-    my @res;
-    for my $a ( 0 .. 100 ) {
-        my $n = $pf - $a * $af;
-        next if $n < 0;
-        my $b = $n / $bf;
-        next if $a*$ax +$b*$bx != $px;
-        next if $a*$ay +$b*$by != $py;
-        next if $b > 100 ;
-        my $tokens = 3 * $a + $b;
-        push @res, $tokens;
-    }
-
-    if (@res) {
-        my $min = min(@res);
-        $solution_1 += $min;
-    }
+    $solution_1 += cost( $ax, $ay, $bx, $by, $px, $py );
+    $px         += $err;
+    $py         += $err;
+    $solution_2 += cost( $ax, $ay, $bx, $by, $px, $py );
 }
 
 say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";
+
+sub cost {
+    my ( $ax, $ay, $bx, $by, $px, $py ) = @_;
+
+    my $anum  = $by * $px - $bx * $py;
+    my $bnum  = -$ay * $px + $ax * $py;
+    my $denom = $ax * $by - $ay * $bx;
+
+    if ( $anum % $denom == 0 && $bnum % $denom == 0 ) {
+        return ( 3 * $anum + $bnum ) / $denom;
+    }
+    return 0;
+}
 
 # vim:ft=perl:sts=4:sw=4:et
