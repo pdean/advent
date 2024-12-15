@@ -1,12 +1,41 @@
 #!/usr/bin/perl
 
 use v5.38;
-use feature qw(multidimensional);
 
 @ARGV = shift // "input";
 
+#my $X = 11;
+#my $Y = 7;
+my $X = 101;
+my $Y = 103;
+my $MX = int $X/2;
+my $MY = int $Y/2;
+
 my $solution_1 = 0;
 my $solution_2 = 0;
+
+my @data = map {[/-{0,1}\d+/g]} <>;
+
+for (1..100) {
+    for my $r (@data) {
+        $$r[0] = ($$r[0] + $$r[2]) % $X;
+        $$r[1] = ($$r[1] + $$r[3]) % $Y;
+    }
+}
+
+my ($q1, $q2, $q3, $q4) = (0,0,0,0);
+
+for my $r (@data) {
+    my ($x, $y) = @$r;
+    
+    ++$q1 if $x < $MX && $y < $MY;
+    ++$q2 if $x > $MX && $y < $MY;
+    ++$q3 if $x < $MX && $y > $MY;
+    ++$q4 if $x > $MX && $y > $MY;
+}
+
+$solution_1 = $q1*$q2*$q3*$q4;
+
 
 say "Solution 1: $solution_1";
 say "Solution 2: $solution_2";
