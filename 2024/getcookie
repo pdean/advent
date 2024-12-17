@@ -1,2 +1,4 @@
 #!/bin/sh
-sqlite3 ~/.mozilla/firefox/tcz0zg38.default-release/cookies.sqlite "select value from moz_cookies where name='session' and host='.adventofcode.com';" >~/.adventofcode.session
+tmp=(~/.mozilla/firefox/*.default-release)
+sqlite3 ${tmp[0]}/cookies.sqlite \
+    "select value from moz_cookies where name='session' and host='.adventofcode.com';" >~/.adventofcode.session
