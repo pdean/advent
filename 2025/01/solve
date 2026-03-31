@@ -1,36 +1,27 @@
 #!/usr/bin/perl
 
-use v5.38;
-use feature qw(multidimensional);
-
 @ARGV = shift // "input";
 
-my $solution_1 = 0;
-my $solution_2 = 0;
-
+my $sol1 = 0;
+my $sol2 = 0;
 my $dial = 50;
-my $old;
 
 while (<>) {
     chomp;
     my ( $d, $t ) = (/(\S)(\d+)/);
-    $t   = -$t if ( $d eq 'L' );
-    $old = $dial;
-    $dial += $t;
-    while ( $dial < 0 ) {
-        $dial += 100;
-        $solution_2++ if $old != 0;
+    for ( 1 .. $t ) {
+        if ( $d eq 'L' ) {
+            $dial = ( $dial - 1 + 100 ) % 100;
+        }
+        else {
+            $dial = ( $dial + 1 ) % 100;
+        }
+        $sol2++ if ( $dial == 0 );
     }
-    while ( $dial > 99 ) {
-        $dial -= 100;
-        $solution_2++ if $dial != 0;
-    }
-    $solution_1++ if ( $dial == 0 );
+    $sol1++ if ( $dial == 0 );
 }
 
-$solution_2 += $solution_1;
-
-say "Solution 1: $solution_1";
-say "Solution 2: $solution_2";
+print "Solution 1: $sol1\n";
+print "Solution 2: $sol2\n";
 
 # vim:ft=perl:sts=4:sw=4:et
