@@ -9,18 +9,6 @@ use warnings;
 
 my $sol1 = 0;
 my $sol2 = 0;
-my $max  = 0;
-
-my @f;
-$f[2]  = [2];
-$f[3]  = [3];
-$f[4]  = [2,4];
-$f[5]  = [5];
-$f[6]  = [ 2, 3, 6 ];
-$f[7]  = [7];
-$f[8]  = [ 2, 4, 8 ];
-$f[9]  = [3,9];
-$f[10] = [ 2, 5, 10 ];
 
 for ( split /,/, <> ) {
     my ( $a, $b ) = /(\d+)-(\d+)/;
@@ -28,34 +16,32 @@ for ( split /,/, <> ) {
         my $n = $_;
         my $s = sprintf "%d", $n;
         my $l = length $s;
-        $max = $l if ( $l > $max );
-        next      if ( !exists( $f[$l] ) );
-        for my $i ( @{ $f[$l] } ) {
+        for ( 2 .. $l ) {
+            my $i = $_;
+            next if ( $l % $i );
             my $j = $l / $i;
             my @p;
             for my $k ( 0 .. $i - 1 ) {
                 push @p, substr( $s, $k * $j, $j );
             }
             my $equal = 1;
-            for (1 .. $#p) {
-                if ($p[0] ne $p[$_]) {
+            for ( 1 .. $#p ) {
+                if ( $p[0] ne $p[$_] ) {
                     $equal = 0;
                     last;
                 }
             }
+
             if ($equal) {
-                $sol2+= $n;
+                $sol2 += $n;
                 if ( $i == 2 ) {
-                    $sol1+= $n;
+                    $sol1 += $n;
                 }
-                say "$s is $i pieces of $p[0]";
                 last;
             }
         }
     }
 }
-
-say "max length = $max";
 
 print "Solution 1: $sol1\n";
 print "Solution 2: $sol2\n";
