@@ -11,6 +11,25 @@ my $sol2 = 0;
 while (<>) {
     chomp;
     my @a  = split //, $_;
+    $sol1 += joltage(\@a, 2);
+    #    $sol2 += joltage(\@a, 12);
+
+}
+
+print "Solution 1: $sol1\n";
+print "Solution 2: $sol2\n";
+
+sub joltage {
+    my ($p, $bat) = @_;
+    my @a = @$p;
+    
+    my $i = 0;
+    for my $b (0 .. $bat -1) {
+
+
+    }
+
+
     my $li = 0;
     my $ld = $a[$li];
     for my $i ( 1 .. $#a - 1 ) {
@@ -29,11 +48,8 @@ while (<>) {
             $ri = $i;
         }
     }
-    $sol1 += 10 * $ld + $rd;
-
+    10 * $ld + $rd;
 }
 
-print "Solution 1: $sol1\n";
-print "Solution 2: $sol2\n";
 
 # vim:ft=perl:sts=4:sw=4:et
