@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use Data::Dump qw(dump);
+use List::Util qw( product sum);
+
+@ARGV = shift // "input";
+
+my $sol1 = 0;
+my $sol2 = 0;
+
+my ( @data, @trans );
+
+while (<>) {
+    chomp;
+    push @data, [ split " " ];
+}
+
+my $m = $#data;
+my $n = $#{ $data[0] };
+for my $i ( 0 .. $m ) {
+    for my $j ( 0 .. $n ) {
+        $trans[$j][$i] = $data[$i][$j];
+    }
+}
+
+for (@trans) {
+    my @line = @$_;
+    my $op   = pop @line;
+    if ( $op eq '+' ) {
+        $sol1 += sum @line;
+    }
+    if ( $op eq '*' ) {
+        $sol1 += product @line;
+    }
+}
+
+say "Solution 1: $sol1";
+say "Solution 2: $sol2";
+
+# vim:ft=perl:sts=4:sw=4:et
