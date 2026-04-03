@@ -11,17 +11,19 @@ use List::Util qw( product sum);
 my $sol1 = 0;
 my $sol2 = 0;
 
-my ( @data, @trans );
+my ( @input, @data, @trans );
 
-while (<>) {
-    chomp;
-    push @data, [ split " " ];
+while ( my $line = <> ) {
+    chomp $line;
+    push @input, $line;
 }
 
-my $m = $#data;
-my $n = $#{ $data[0] };
-for my $i ( 0 .. $m ) {
-    for my $j ( 0 .. $n ) {
+for my $i ( 0 .. $#input ) {
+    push @data, [ split " ", $input[$i] ];
+}
+
+for my $i ( 0 .. $#data ) {
+    for my $j ( 0 .. $#{ $data[0] } ) {
         $trans[$j][$i] = $data[$i][$j];
     }
 }
@@ -29,11 +31,36 @@ for my $i ( 0 .. $m ) {
 for (@trans) {
     my @line = @$_;
     my $op   = pop @line;
-    if ( $op eq '+' ) {
-        $sol1 += sum @line;
+    if ( $op eq '+' ) { $sol1 += sum @line; }
+    if ( $op eq '*' ) { $sol1 += product @line; }
+}
+
+my ( @data2, @trans2 );
+
+for my $i ( 0 .. $#input ) {
+    push @data2, [ split "", $input[$i] ];
+}
+
+my @ops = grep { !/ / } @{ pop @data2 };
+
+for my $i ( 0 .. $#data2 ) {
+    for my $j ( 0 .. $#{ $data2[0] } ) {
+        $trans2[$j][$i] = $data2[$i][$j];
     }
-    if ( $op eq '*' ) {
-        $sol1 += product @line;
+}
+push @trans2, [" "];
+
+my @nums;
+for (@trans2) {
+    my $line = join "", @$_;
+    if ( $line =~ /^\s+$/ ) {
+        my $op = shift @ops;
+        if ( $op eq '+' ) { $sol2 += sum @nums; }
+        if ( $op eq '*' ) { $sol2 += product @nums; }
+        @nums = ();
+    }
+    else {
+        push @nums, $line;
     }
 }
 
