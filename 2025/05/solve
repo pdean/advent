@@ -1,19 +1,54 @@
 #!/usr/bin/env perl
 
+use 5.010;
 use strict;
 use warnings;
+use List::Util qw(max);
 
 @ARGV = shift // "input";
 
 my $sol1 = 0;
 my $sol2 = 0;
+my @arr;
 
-while (<>) {
-    chomp;
-    
+local $/ = "";    # paragraph mode
+my ( $r, $i ) = <>;
+chomp $r;
+for ( split /\n/, $r ) {
+    my ( $a, $b ) = /(\d+)-(\d+)/;
+    push @arr, [ $a, $b ];
+}
+chomp $i;
+LOOP:
+for my $f ( split /\n/, $i ) {
+    for (@arr) {
+        my ( $a, $b ) = @$_;
+        if ( $f >= $a && $f <= $b ) {
+            ++$sol1;
+            next LOOP;
+        }
+    }
 }
 
-print "Solution 1: $sol1\n";
-print "Solution 2: $sol2\n";
+my @res;
+
+@arr = sort { $a->[0] <=> $b->[0] } @arr;
+push @res, $arr[0];
+for my $i ( 1 .. $#arr ) {
+    if ( $arr[$i][0] <= $res[-1][1] ) {
+        $res[-1][1] = max( $res[-1][1], $arr[$i][1] );
+    }
+    else {
+        push @res, $arr[$i];
+    }
+}
+
+for (@res) {
+    my ( $a, $b ) = @$_;
+    $sol2 += $b - $a + 1;
+}
+
+say "Solution 1: $sol1";
+say "Solution 2: $sol2";
 
 # vim:ft=perl:sts=4:sw=4:et
