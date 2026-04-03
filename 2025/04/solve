@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+use 5.010;
+
 use strict;
 use warnings;
 
@@ -12,42 +14,59 @@ my @grid;
 
 while (<>) {
     chomp;
-    push @grid, [split //];
-    
+    push @grid, [ split // ];
 }
 
 my $m = $#grid;
-my $n = $#{$grid[0]};
+my $n = $#{ $grid[0] };
 
-for my $i (0 .. $m) {
-    for my $j (0 .. $n) {
-        my $c = $grid[$i][$j];
-        my $s = 0;
-        next if $c ne '@';
-        for my $di (-1, 0, 1) {
-            for my $dj (-1, 0, 1) {
-                next if $di == 0 && $dj == 0;
-                ++$s if check($i, $j, $di, $dj);
-            }
-        }
-        ++$sol1 if $s < 4;
-    }
+my $sol = pass();
+$sol1 = $sol;
+$sol2 = $sol;
+while (1) {
+    my $sol = pass();
+    last if $sol == 0;
+    $sol2 += $sol;
 }
 
-print "Solution 1: $sol1\n";
-print "Solution 2: $sol2\n";
+say "Solution 1: $sol1";
+say "Solution 2: $sol2";
+
+sub pass {
+    my $sol = 0;
+    my @index;
+    for my $i ( 0 .. $m ) {
+        for my $j ( 0 .. $n ) {
+            my $c = $grid[$i][$j];
+            my $s = 0;
+            next if $c ne '@';
+            for my $di ( -1, 0, 1 ) {
+                for my $dj ( -1, 0, 1 ) {
+                    next if $di == 0 && $dj == 0;
+                    ++$s if check( $i, $j, $di, $dj );
+                }
+            }
+            if ( $s < 4 ) {
+                ++$sol;
+                push @index, [ $i, $j ];
+            }
+        }
+    }
+    for my $ind (@index) {
+        my ( $i, $j ) = @$ind;
+        $grid[$i][$j] = '.';
+    }
+    $sol;
+}
 
 sub check {
-    my ($i, $j, $di, $dj) = @_;
+    my ( $i, $j, $di, $dj ) = @_;
     my $is = $i + $di;
     return 0 if $is < 0 || $is > $m;
-    my $js = $j +$dj;
+    my $js = $j + $dj;
     return 0 if $js < 0 || $js > $n;
     my $c = $grid[$is][$js];
     return 1 if $c eq '@';
 }
-
-
-
 
 # vim:ft=perl:sts=4:sw=4:et
