@@ -1,7 +1,10 @@
 #!/usr/bin/env perl
 
+use 5.010;
 use strict;
 use warnings;
+use Data::Dumper;
+use List::Util qw(product sum);
 
 @ARGV = shift // "input";
 
@@ -13,7 +16,7 @@ while (<>) {
     
 }
 
-print "Solution 1: $sol1\n";
-print "Solution 2: $sol2\n";
+say "Solution 1: $sol1";
+say "Solution 2: $sol2";
 
 # vim:ft=perl:sts=4:sw=4:et
