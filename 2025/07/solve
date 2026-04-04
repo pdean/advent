@@ -11,10 +11,23 @@ use List::Util qw(product sum);
 my $sol1 = 0;
 my $sol2 = 0;
 
+my @grid;
+
 while (<>) {
     chomp;
-    
+    push @grid, [ split // ];
 }
+
+my $m = $#grid;
+my $n = $#{ $grid[0] };
+
+say "rows 0 to $m";
+say "columns 0 to $n";
+
+for my $i (1 .. $m) {
+    for my $j (0 .. $n) {
+        if ($grid[$i][$j] eq '.') {
+            if ($grid[$i-1][$j] =~ /(
 
 say "Solution 1: $sol1";
 say "Solution 2: $sol2";
